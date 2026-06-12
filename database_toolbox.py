@@ -92,7 +92,7 @@ def TextBox(title, msg):
 	class TextBoxes(xbmcgui.WindowXMLDialog):
 
 		def onAction(self, action):
-			if   action == ACTION_PREVIOUS_MENU: self.close()
+			if action == ACTION_PREVIOUS_MENU: self.close()
 			elif action == ACTION_NAV_BACK: self.close()
 
 		def onClick(self, controlId):
