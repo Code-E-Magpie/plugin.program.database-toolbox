@@ -6,7 +6,6 @@ Easy to use database toolbox to maintain Kodi database files in a small package.
 
 
 # Instructions
-
 Open the add-on to access the menu.
 
 Select one of the '>' menu items and follow the user information.
