@@ -10,6 +10,29 @@ Open the add-on to access the menu.
 
 Select one of the '>' menu items and follow the user information.
 
+A 'Would you like to continue ?' option is provided to exit the item before processing begins.
+
+'Exit Only >' - exits the add-on.
+
+
+# Notes
+It is important to proceed carefully so changes can be reversed if necessary e.g. 'Clean Addons Database  >' closes Kodi without cleanup at the end.
+
+• Backup databases using Kodi file manager or a backup add-on.
+
+• Close other add-ons and save any changes.
+
+• Restart Kodi if required.
+
+
+ln everyday use the Textures13.db can get corrupted and prevent Kodi starting. Deleting the Textures13.db database resolves this as it rebuilds on startup.<br>Other databases such as the add-ons database do not rebuild and may require restoring from backup if startup fails.
+
+
+Later versions of Android make restoring a backedup database difficult.
+Android prevents users accessing the Data folder containing data for all the installed apps including Kodi and its databases.
+
+Access is possible using a file explorer app from the Play Store such as Total Commander.<br>The app needs to be used with the Shizuku app from the Play Store or if restricted from GitHub https://github.com/RikkaApps/Shizuku
+
 
 # Development
 Kodi v21.3 Omega apk (Android app) with Confluence skin as default (including default font).
@@ -35,4 +58,4 @@ Database Toolbox will be maintained for new releases of Kodi and changes to Pyth
 Distribution of this add-on is NOT permitted.
 This add-on is exclusively distributed via the Magpie Repository and / or Code-E-Magpie on GitHub.
 
-The code and files of this add-on are free for use, subject to crediting Code-E-Magpie.
+The code and files of this add-on are free for use, subject to crediting Code-E-Magpie
