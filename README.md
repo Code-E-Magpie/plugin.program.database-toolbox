@@ -18,7 +18,7 @@ A 'Would you like to continue ?' option is provided to exit the item before proc
 # Notes
 It is important to proceed carefully so changes can be reversed if necessary e.g. 'Clean Addons Database  >' closes Kodi without cleanup at the end.
 
-• Backup databases using Kodi file manager or a backup add-on.
+• Backup databases using file manager or a backup add-on.
 
 • Close other add-ons and save any changes.
 
