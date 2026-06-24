@@ -6,7 +6,7 @@ Easy to use database toolbox to maintain Kodi database files in a small package.
 
 Please read the Instructions before use and see the Changelog to see what is new.
 
-To view the Instructions and the Changelog: open the add-on to access the menu and click on 'User Information >'
+To view the Instructions and the Changelog:<br/>open the add-on to access the menu and click on 'User Information >'
 
 
 # Notes
@@ -19,13 +19,13 @@ It is important to proceed carefully so changes can be reversed if necessary i.e
 • Restart Kodi if required.
 
 
-ln everyday use the Textures13.db can get corrupted and prevent Kodi starting. Deleting the Textures13.db database resolves this as it rebuilds on startup.<br>Other databases such as the add-ons database do not rebuild and may require restoring from backup if startup fails.
+ln everyday use the Textures13.db can get corrupted and prevent Kodi starting. Deleting the Textures13.db database resolves this as it rebuilds on startup.<br/>Other databases such as the add-ons database do not rebuild and may require restoring from backup if startup fails.
 
 
 Later versions of Android make restoring a backedup database difficult.
 Android prevents users accessing the Data folder containing data for all the installed apps including Kodi and its databases.
 
-Access is possible using a file explorer app from the Play Store such as Total Commander.<br>The app needs to be used with the Shizuku app from the Play Store or if restricted from GitHub https://github.com/RikkaApps/Shizuku
+Access is possible using a file explorer app from the Play Store such as Total Commander.<br/>The app needs to be used with the Shizuku app from the Play Store or if restricted from GitHub https://github.com/RikkaApps/Shizuku
 
 
 # Development
