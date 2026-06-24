@@ -4,7 +4,9 @@
 
 Easy to use database toolbox to maintain Kodi database files in a small package.
 
-Please read the Instructions before use and see the Changelog to see what is new. To view the Instructions and the Changelog: open the add-on to access the menu and click on 'User Information >'
+Please read the Instructions before use and see the Changelog to see what is new.
+
+To view the Instructions and the Changelog: open the add-on to access the menu and click on 'User Information >'
 
 
 # Notes
