@@ -4,21 +4,13 @@
 
 Easy to use database toolbox to maintain Kodi database files in a small package.
 
-
-# Instructions
-Open the add-on to access the menu.
-
-Select one of the '>' menu items and follow the user information.
-
-A 'Would you like to continue ?' option is provided to exit the item before processing begins.
-
-'Exit Only >' - exits the add-on.
+Please read the Instructions before use and see the Changelog to see what is new. To view the Instructions and the Changelog: open the add-on to access the menu and click on 'User Information >'
 
 
 # Notes
-It is important to proceed carefully so changes can be reversed if necessary e.g. 'Clean Addons Database  >' closes Kodi without cleanup at the end.
+It is important to proceed carefully so changes can be reversed if necessary i.e. 'Clean Addons Database' closes Kodi without cleanup at the end.
 
-• Backup databases using file manager or a backup add-on.
+• Backup databases using Kodi file manager or a backup add-on.
 
 • Close other add-ons and save any changes.
 
@@ -49,8 +41,6 @@ Code debugged and reengineered where required using https://aipy.dev/tools
 # Future development
 Database Toolbox functionality is simple and easy to use and will remain so.
 
-Further development of Database Toolbox is planned.
-
 Database Toolbox will be maintained for new releases of Kodi and changes to Python where possible.
 
 
@@ -58,4 +48,4 @@ Database Toolbox will be maintained for new releases of Kodi and changes to Pyth
 Distribution of this add-on is NOT permitted.
 This add-on is exclusively distributed via the Magpie Repository and / or Code-E-Magpie on GitHub.
 
-The code and files of this add-on are free for use, subject to crediting Code-E-Magpie
+The code and files of this add-on are free for use, subject to crediting Code-E-Magpie.
