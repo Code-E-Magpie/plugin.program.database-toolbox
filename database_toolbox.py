@@ -18,7 +18,7 @@
 # ============================================================
 
 import xbmc, xbmcaddon, xbmcgui, xbmcplugin, xbmcvfs
-import os, sqlite3, sys
+import fnmatch, os, sqlite3, sys
 
 # ============================================================
 # Variables
@@ -26,34 +26,49 @@ import os, sqlite3, sys
 
 ADDON_ID = xbmcaddon.Addon().getAddonInfo('id') # id in addons.xml
 ADDON = xbmcaddon.Addon(ADDON_ID)
+ADDON_DATA_PATH = 'special://userdata/addon_data'
 ADDON_DEVELOPER = ADDON.getAddonInfo('author') # provider-name in addons.xml (developer)
 ADDON_FANART = ADDON.getAddonInfo('fanart')
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_NAME = ADDON.getAddonInfo('name') # name in addons.xml
 ADDON_TITLE = (' '.join((ADDON_NAME).strip(' '))) # insert spaces between + remove leading & trailing
 ADDON_VERSION = ADDON.getAddonInfo('version') # version in addons.xml
+ADDONS_DB = 'Addons33.db'
+ADDONS_PATH = 'special://home/addons'
 DATABASE = xbmcvfs.translatePath('special://database/')
-DATABASE_ADDONS = os.path.join(DATABASE, 'Addons33.db')
+DATABASE_ADDONS = os.path.join(DATABASE, ADDONS_DB)
+DATABASE_PATH = 'special://database/'
+HOME = xbmcvfs.translatePath('special://home/')
+HOME_PATH = 'special://home/'
+NOTIFICATION_DURATION = ADDON.getSetting('NOTIFICATION_DURATION')
 PLUGIN_ID = int(sys.argv[1])
 PLUGIN_URL = sys.argv[0]
-TEXT_ADDON = 'yellow' # default to "name" colour in addon.xml if quote marks are empty i.e. = ''
-TEXT_DARK = 'darkgray'
-TEXT_DIM = 'dimgray'
-TEXT_GENERAL = 'silver'
-TEXT_HIGHLIGHT = 'yellow'
-TEXT_ITEM = 'blue'
-TEXT_VALUE = 'orange'
+TEXT_ADDON = ADDON.getSetting('TEXT_ADDON')
+TEXT_DARK = ADDON.getSetting('TEXT_DARK')
+TEXT_DIM = ADDON.getSetting('TEXT_DIM')
+TEXT_GENERAL = ADDON.getSetting('TEXT_GENERAL')
+TEXT_HIGHLIGHT = ADDON.getSetting('TEXT_HIGHLIGHT')
+TEXT_ITEM = ADDON.getSetting('TEXT_ITEM')
+TEXT_VALUE = ADDON.getSetting('TEXT_VALUE')
 TOOLBOX = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'media', 'toolbox.png')
+USERDATA_PATH = 'special://userdata/'
 
 # ============================================================
-# Addon_ID_Version / Addon_Title / Addons / Dialogue / Log_Title
+# Addon_ID_Version / Addon_Title / Dialogue / Log_Title
 # ============================================================
 
 Addon_ID_Version = ('[COLOR %s]%s [/COLOR][COLOR %s] %s[/COLOR]' % (TEXT_ITEM, ADDON_ID, TEXT_VALUE, ADDON_VERSION))
 Addon_Title = ('[COLOR %s]%s[/COLOR]' % (TEXT_ADDON, ADDON_TITLE))
-Addons = ('[COLOR %s]addons > [/COLOR]' % TEXT_GENERAL)
 Dialogue = xbmcgui.Dialog()
 Log_Title = ('[COLOR %s]%s [/COLOR]' % (TEXT_ADDON, ADDON_NAME))
+
+# ============================================================
+# Addons / Clean / Db
+# ============================================================
+
+Addons = ('[COLOR %s]addons > [/COLOR]' % TEXT_GENERAL)
+Clean = ('[COLOR %s]clean > [/COLOR]' % TEXT_GENERAL)
+Db = ('[COLOR %s]db > [/COLOR]' % TEXT_GENERAL)
 
 # ============================================================
 # FUNCTION: Log
@@ -62,11 +77,18 @@ Log_Title = ('[COLOR %s]%s [/COLOR]' % (TEXT_ADDON, ADDON_NAME))
 def Log(msg, level = xbmc.LOGDEBUG):
 	xbmc.log(msg, level = level)
 
+# ============================================================
+# FUNCTION: Notification
+# ============================================================
+
+def Notification(title, message, times = NOTIFICATION_DURATION, icon = ADDON_ICON, sound = False):
+	Dialogue.notification(title, message, icon, int(times), sound)
+
 #####################################################################################
 
 # ============================================================
 # ------------------------------------------------------------
-# User Information
+# Information
 # ------------------------------------------------------------
 # ============================================================
 
@@ -119,21 +141,91 @@ def TextBox(title, msg):
 	del textbox
 
 # ============================================================
+# FUNCTION: Size_Convert
+# ============================================================
+
+def Size_Convert(num, suffix = 'B'):
+
+	for unit in ['', 'K', 'M', 'G']:
+		if abs(num) < 1024.0:
+			return "%3.02f %s%s" % (num, unit, suffix)
+		num /= 1024.0
+
+	return "%.02f %s%s" % (num, 'G', suffix)
+
+# ============================================================
+# FUNCTION: Database_Count
+# ============================================================
+
+def Database_Count():
+
+	database_count = 0
+	thumbs_count = 0
+
+	for _, _, files in os.walk(HOME):
+		database_count += sum(1 for file in files if file.endswith('.db'))
+		thumbs_count += files.count('Thumbs.db')
+
+	return database_count, thumbs_count
+
+# ============================================================
+# FUNCTION: Database_Information
+# ============================================================
+
+def Database_Information():
+
+	database_paths = []
+
+	for root, _, files in os.walk(HOME):
+		for file in fnmatch.filter(files, '*.db'):
+			database_path = os.path.join(root, file)
+			database_size = Size_Convert(os.path.getsize(database_path))
+			database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> [/COLOR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, database_size, TEXT_DIM, TEXT_GENERAL, database_path))
+
+	database = "\n".join(database_paths)
+
+	database_count, thumbs_count = Database_Count()
+
+	Database_Information_Text = '[COLOR %s][B]D A T A B A S E   I N F O R M A T I O N[/B][COLOR %s][LIGHT][CR](Database Size / Full Path)[/LIGHT][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, TEXT_VALUE, TEXT_GENERAL, database)
+
+	TextBox('[B]%s[/B][CR][COLOR %s]Databases: [/COLOR][COLOR %s]%s  [/COLOR][COLOR %s][LIGHT]Thumbs.db files: [/COLOR][COLOR %s]%s[/LIGHT][/COLOR]' % (Addon_Title, TEXT_ITEM, TEXT_VALUE, database_count, TEXT_ITEM, TEXT_VALUE, thumbs_count), Database_Information_Text)
+
+# ============================================================
+# FUNCTION: Development_Information
+# ============================================================
+
+MAGPIE_TEXT = 'M A G P I E   R E P O S I T O R Y[CR][CR]The official repository of [COLOR silver]C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e[/COLOR] add-ons.[CR]Distribution of the Magpie Repository is permitted.[CR][CR][COLOR silver]IMPORTANT:[CR]Distribution of C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e add-ons are NOT permitted.[CR]C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e add-ons are exclusively distributed via the Magpie Repository and / or [COLOR silver]C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e[/COLOR] on GitHub.[CR]The code and files of these add-ons are free for use, subject to crediting C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e.[/COLOR][CR][CR][COLOR %s]Available on GitHub only.[CR]https://github.com/Code-E-Magpie/repository.magpie[CR][CR]To install Magpie Repository:[CR]Add the Kodi source https://Code-E-Magpie.github.io/repository.magpie/[CR]Use the \'Install from zip file\' method to install the Magpie Repository.[/COLOR]' % TEXT_DARK
+
+DATABASE_TEXT = '[CR][CR][CR]D A T A B A S E   T O O L B O X[CR][CR]Database Toolbox with easy to use database maintenance tools.[CR][CR][COLOR %s]Add-on available from Magpie Repository. Further details on GitHub and within the add-on itself.[CR]https://github.com/Code-E-Magpie/plugin.program.database-toolbox[/COLOR]' % TEXT_DARK
+
+MAINTENANCE_TEXT = '[CR][CR][CR]M A I N T E N A N C E   T O O L B O X[CR][CR]Maintenance Toolbox with easy to read Kodi information (system, add-ons, network and internet).[CR]Clear cache + folders, surplus add-ons, temp folder and thumbnails.[CR]View logs and errors (new and old).[CR]Check repositories, sources and internet speed (Speedtest by Ookla).[CR]Backup and restore favourites, sources, logs, userdata, add-ons, add-on data etc.[CR][CR][COLOR %s]Add-on available from Magpie Repository. Further details on GitHub and within the add-on itself.[CR]https://github.com/Code-E-Magpie/plugin.program.maintenance-toolbox[/COLOR]' % TEXT_DARK
+
+REORDER_TEXT = '[CR][CR][CR]R E O R D E R   F A V O U R I T E S[CR][CR]Easy to use reordering of favourites for Kodi.[CR][CR][COLOR %s]Add-on available from Magpie Repository. Further details on GitHub and within the add-on itself.[CR]https://github.com/Code-E-Magpie/plugin.program.reorder-favourites[/COLOR]' % TEXT_DARK
+
+LOG_TEXT = '[CR][CR][CR]S Y S T E M   L O G   T O O L B O X[CR][CR]System Log Toolbox easy to use system log viewer.[CR][CR][COLOR %s]Add-on available from Magpie Repository. Further details on GitHub and within the add-on itself.[CR]https://github.com/Code-E-Magpie/plugin.program.system-log-toolbox[/COLOR]' % TEXT_DARK
+
+SPECIAL_TEXT = '[CR][CR][CR]F A V O U R I T E S   &   S O U R C E S[CR][CR]Special Favourites: Kodi special paths and customised examples.[CR]Special Sources: Kodi special paths (files & folders) and customised examples.[CR][CR][COLOR %s]Available on GitHub only.[CR]https://github.com/Code-E-Magpie/Code-E-Magpie[/COLOR]' % TEXT_DARK
+
+TEMPLATE_TEXT = '[CR][CR][CR]T E M P L A T E   R E P O S I T O R Y[CR][CR]Created to illustrate a GitHub repository with a simple folder structure linked to a Kodi repository.[CR][CR][COLOR %s]Available on GitHub only.[CR]https://github.com/Code-E-Magpie/repository.template[/COLOR][CR][CR]Alternatively a GitHub repository linked to a Kodi source, without using a Kodi repository.[CR][CR][COLOR %s]Available on GitHub only.[CR]https://github.com/Code-E-Magpie/repository.simple[/COLOR]' % (TEXT_DARK, TEXT_DARK)
+
+Development_Information_Text = '[CR][CR][CR][COLOR %s][B]C o d e - E - M a g p i e   D e v e l o p m e n t[/B][CR][COLOR %s][LIGHT](Magpie Repository / Database Toolbox / Maintenance Toolbox / Reorder Favourites / System Log Toolbox / Favourites & Sources / Template Repository)[/LIGHT][/COLOR][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, TEXT_VALUE, TEXT_GENERAL, (MAGPIE_TEXT + DATABASE_TEXT + MAINTENANCE_TEXT + REORDER_TEXT + LOG_TEXT + SPECIAL_TEXT + TEMPLATE_TEXT))
+
+# ============================================================
 # FUNCTION: User_Information
 # ============================================================
 
-INSTRUCTIONS_TEXT = '[CR]I N S T R U C T I O N S[CR][CR]Open the add-on to access the menu.[CR]Select one of the \'>\' menu items and follow the user information.'
+INSTRUCTIONS_TEXT = 'I N S T R U C T I O N S[CR][CR]Open the add-on to access the menu.[CR]Select one of the \'>\' menu items and follow the user information.[CR][CR]\'Database Toolbox Settings >\' user settings:[CR]• \'Clean Databases (folder)\' options set dialogue boxes on / off[CR]• \'Clean Databases (folder)\' options set notifications on / off[CR]• set notification duration[CR]• customise text colours with trillions of text colour combinations[CR][CR]\'Clean Addons Database\' has a \'Would you like to continue ?\' option to exit before processing begins (see \'N O T E S\' below).[CR][CR]\'Clean Databases (folder)\' options exclude \'Thumbs.db\' files.[CR]\'Clean Databases (folder): home >\' includes all databases but excludes \'Thumbs.db\' files.[CR]\'Clean Databases (folder): userdata >\' includes all databases but excludes addons and \'Thumbs.db\' files.[CR][CR]\'Database Information >\' includes \'Thumbs.db\' files in the \'Database Count\' for completeness.[CR]There is a separate total for \'Thumbs.db files\' and a list of databases (Database Size and Full Path).[CR][CR]\'Exit Only >\' exits the add-on.'
 
-NOTES_TEXT = '[CR][CR][CR]N O T E S[CR][CR]Backup databases before proceeding.[CR]Close other add-ons and save any changes. Restart Kodi if required.[CR][CR]\'Clean Addons Database  >\' Kodi will need to close without cleanup at the end.[CR][CR]\'Exit Only >\' - exits the add-on.'
+NOTES_TEXT = '[CR][CR][CR]N O T E S[CR][CR]It is important to proceed carefully so changes can be reversed if necessary i.e. \'Clean Addons Database\' closes Kodi without cleanup at the end.[CR][CR]• Backup databases using Kodi file manager or a backup add-on.[CR]• Close other add-ons and save any changes.[CR]• Restart Kodi if required.[CR][CR]ln everyday use the Textures13.db can get corrupted and prevent Kodi starting. Deleting the Textures13.db database resolves this as it rebuilds on startup.[CR]Other databases such as the add-ons database do not rebuild and may require restoring from backup if startup fails.[CR][CR]Later versions of Android make restoring a backedup database difficult.[CR]Android prevents users accessing the Data folder containing data for all the installed apps including Kodi and its databases.[CR]Access is possible using a file explorer app from the Play Store such as Total Commander.[CR]The app needs to be used with the Shizuku app from the Play Store or if restricted from GitHub https://github.com/RikkaApps/Shizuku'
 
 DEVELOPMENT_TEXT = '[CR][CR][CR]D E V E L O P M E N T[CR][CR]Kodi v21.3 Omega apk (Android app) with Confluence skin as default (including default font).[CR]Tablet (1340 x 800 aspect ratio 5:3) running Android 14 using QuickEdit apk (TryItAndSee / LearnAsYouGo iterative development and testing).[CR]Chromecast HD (1280 x 720 aspect ratio 16:9) running Android TV OS version 14 (user testing).[CR]100% tested and working on Android.[CR]Not tested on other platforms.[CR]Code debugged and reengineered where required using https://aipy.dev/tools'
 
-CHANGELOG_TEXT = '[CR][CR][CR]C H A N G E L O G [LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information updated including instructions and changelog'
+CHANGELOG_TEXT = '[CR][CR][CR]C H A N G E L O G [LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 1.10.0 (10 menu items)[CR]- code added from OpenWizard 2.0.7 by drinfernoo & slamious (plugin.program.openwizard)[CR]- Clean Databases created[CR]- Database Information created[CR]- variables and functions reworked[CR]- menu, multiselect dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR]- added user settings for dialogue boxes, notifications, notification duration and trillions of text colour combinations[CR][CR]version 1.3.1 (3 menu items)[CR]- database variable added[CR]- dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- Clean Addons Database created[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information added (instructions, notes, development and changelog)'
 
 User_Information_Text = '[COLOR %s][B]U S E R   I N F O R M A T I O N[/B][CR][COLOR %s][LIGHT](Instructions / Notes / Development / Changelog)[/LIGHT][/COLOR][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, TEXT_VALUE, TEXT_GENERAL, (INSTRUCTIONS_TEXT + NOTES_TEXT + DEVELOPMENT_TEXT + CHANGELOG_TEXT))
 
 def User_Information():
-	TextBox('[B]%s[/B][CR]%s' % (Addon_Title, Addon_ID_Version), User_Information_Text)
+	TextBox('[B]%s[/B][CR]%s' % (Addon_Title, Addon_ID_Version), User_Information_Text + Development_Information_Text)
 
 #####################################################################################
 
@@ -143,15 +235,15 @@ def User_Information():
 
 def Addons_Database():
 
-	Log(Log_Title + Addons + '[COLOR %s][LIGHT]Started (addons database: special://database/Addons33.db)[/LIGHT][/COLOR]' % TEXT_DARK, xbmc.LOGINFO)
+	Log(Log_Title + Addons + '[COLOR %s][LIGHT]Started (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, ADDONS_DB), xbmc.LOGINFO)
 	success = False
 
-	Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Backup the database before proceeding.[/COLOR][CR]Close other add-ons and save any changes.[CR]Restart Kodi if required.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM))
+	Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Backup %s database before proceeding.[/COLOR][CR]Close other add-ons and save any changes.[CR]Restart Kodi if required.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, ADDONS_DB))
 
-	addons_choice = Dialogue.yesno(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Backup the database before proceeding.[CR]Kodi will need to close without cleanup at the end.[/COLOR][CR]Would you like to continue ?[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM), yeslabel = ('[COLOR %s]Clean Database[/COLOR]' % TEXT_VALUE), nolabel = ('[COLOR %s]Cancel Clean[/COLOR]' % TEXT_HIGHLIGHT))
+	addons_choice = Dialogue.yesno(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Kodi will need to close without cleanup at the end.[/COLOR][CR][CR]Would you like to continue ?[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM), yeslabel = ('[COLOR %s]Clean Database[/COLOR]' % TEXT_VALUE), nolabel = ('[COLOR %s]Cancel Clean[/COLOR]' % TEXT_HIGHLIGHT))
 
 	if not addons_choice:
-		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Cancelled[/LIGHT][/COLOR]' % TEXT_DARK, xbmc.LOGINFO)
+		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Cancelled (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, ADDONS_DB), xbmc.LOGINFO)
 		sys.exit()
 
 	try:
@@ -164,13 +256,12 @@ def Addons_Database():
 		cursor.execute('DELETE FROM update_rules;',)
 		cursor.execute('DELETE FROM version;',)
 		con.commit()
-
 		success = True
 
 	except sqlite3.Error as e:
 
-		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Unable to clean database.[/COLOR][CR][CR]See Kodi System Log for details.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM))
-		Log(Log_Title + Addons + 'database read error[CR]%s' % str(e), xbmc.LOGERROR)
+		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Unable to clean addons database: [/COLOR][COLOR %s]%s[/COLOR][CR]See Kodi System Log for details.[CR]The database may not exsist.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, ADDONS_DB))
+		Log(Log_Title + Addons + 'database read error: %s may not exist[CR]%s' % (ADDONS_DB, str(e)), xbmc.LOGERROR)
 		return ''
 
 	finally:
@@ -179,7 +270,7 @@ def Addons_Database():
 				con.close()
 
 		except UnboundLocalError as e:
-			Log(Log_Title + Addons + 'database connection error[CR]%s' % str(e), xbmc.LOGERROR)
+			Log(Log_Title + Addons + 'database connection error: %s[CR]%s' % (ADDONS_DB, str(e)), xbmc.LOGERROR)
 
 	try:
 		con = sqlite3.connect(DATABASE_ADDONS)
@@ -188,19 +279,100 @@ def Addons_Database():
 		con.commit()
 
 	except sqlite3.Error as e:
-		Log(Log_Title + Addons + 'database table error[CR]%s' % str(e), xbmc.LOGERROR)
+		Log(Log_Title + Addons + 'database table error: %s[CR]%s' % (ADDONS_DB, str(e)), xbmc.LOGERROR)
 
 	finally:
 		try:
 			if con:
 				con.close()
+
 		except sqlite3.Error:
 			pass
 
 	if success is True:
-		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Database cleaned.[/COLOR][CR]Kodi will need to close without cleanup.[CR]Press OK to continue.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM))
-		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Finished (addons database: special://database/Addons33.db)[/LIGHT][/COLOR]' % TEXT_DARK, xbmc.LOGINFO)
+		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Cleaned addons database: [/COLOR][COLOR %s]%s[/COLOR][CR]Kodi will need to close without cleanup.[CR]Press OK to continue.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, ADDONS_DB))
+		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Finished (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, ADDONS_DB), xbmc.LOGINFO)
 		os._exit(1)
+
+# ============================================================
+# FUNCTION: Clean_Databases
+# ============================================================
+
+def Clean_Databases(folder_path):
+
+	Log(Log_Title + Clean + '[COLOR %s][LIGHT]Started (clean databases: %s)[/LIGHT][/COLOR]' % (TEXT_DARK, folder_path), xbmc.LOGINFO)
+
+	database = []; database_paths = []
+
+	for root, dirs, files in os.walk(xbmcvfs.translatePath(folder_path)):
+		for file in fnmatch.filter(files, '*.db'):
+			if file != 'Thumbs.db':
+				database_path = os.path.join(root, file)
+				database_size = Size_Convert(os.path.getsize(database_path))
+				path = database_path.replace('\\', '/').split('/')
+				database.append(database_path)
+				database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> %s > [/COLOR]%s' % (TEXT_ITEM, database_size, TEXT_DIM, path[len(path)-2], path[len(path)-1]))
+
+	choice = Dialogue.multiselect(Addon_Title + "[COLOR %s][LIGHT]   (select one or more databases from the list)[/LIGHT][/COLOR]" % TEXT_GENERAL, database_paths, 0, [], False)
+
+	if choice == None:
+		Log(Log_Title + Clean + '[COLOR %s][LIGHT]Cancelled (clean databases: %s)[/LIGHT][/COLOR]' % (TEXT_DARK, folder_path), xbmc.LOGINFO)
+
+	elif len(choice) == 0:
+		Log(Log_Title + Clean + '[COLOR %s][LIGHT]Cancelled (clean databases: %s)[/LIGHT][/COLOR]' % (TEXT_DARK, folder_path), xbmc.LOGINFO)
+
+	else:
+		for database_selected in choice:
+			Database_Cleaner(database[database_selected])
+
+		Log(Log_Title + Clean + '[COLOR %s][LIGHT]Finished (clean databases: %s)[/LIGHT][/COLOR]' % (TEXT_DARK, folder_path), xbmc.LOGINFO)
+
+# ============================================================
+# FUNCTION: Database_Cleaner
+# ============================================================
+
+def Database_Cleaner(database_selected):
+	
+	Log(Log_Title + Db + 'clean: %s' % database_selected, xbmc.LOGINFO)
+
+	if os.path.exists(database_selected):
+		try:
+			textdb = sqlite3.connect(database_selected)
+			textexe = textdb.cursor()
+
+		except Exception as e:
+			Log(Log_Title + Db + 'database connection error: %s[CR]%s' % (database_selected, str(e)), xbmc.LOGERROR)
+			return False
+
+	else:
+		Log(Log_Title + Db + 'database not found: %s' % database_selected, xbmc.LOGERROR)
+		return False
+
+	textexe.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
+	for table in textexe.fetchall():
+		if table[0] == 'version':
+			Log(Log_Title + Db + 'database table skipped: %s' % table[0], xbmc.LOGDEBUG)
+
+		else:
+			try:
+				textexe.execute("DELETE FROM %s" % table[0])
+				textdb.commit()
+				Log(Log_Title + Db + 'database table data cleared: %s' % table[0], xbmc.LOGDEBUG)
+
+			except Exception as e:
+				Log(Log_Title + Db + 'database remove table error: %s[CR]%s' % (table[0], str(e)), xbmc.LOGERROR)
+
+	database_path = database_selected.replace('\\', '/').split('/')
+	database = ('[COLOR %s] > %s > [/COLOR][COLOR %s]%s[/COLOR]' % (TEXT_DIM, database_path[len(database_path)-2], TEXT_DARK, database_path[len(database_path)-1]))
+	textexe.close()
+	
+	database_size = Size_Convert(os.path.getsize(database_selected))
+
+	if ADDON.getSetting('NOTIFICATIONS') == 'true':
+		Notification(Addon_Title, '[COLOR %s]Database Cleaner: %s[/COLOR]' % (TEXT_GENERAL, database))
+	if ADDON.getSetting('DIALOGUE_BOXES') == 'true':
+		Dialogue.ok(Addon_Title, '[COLOR %s]Database Cleaner: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]%s[/COLOR]%s[CR][COLOR %s]%s[/COLOR][CR][/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, database_size, database, TEXT_GENERAL, database_selected))
+	Log(Log_Title + Db + 'clean: %s done' % database_selected, xbmc.LOGINFO)
 
 #####################################################################################
 
@@ -208,22 +380,36 @@ def Addons_Database():
 # Menu Entry Point
 # ============================================================
 
-if '/Addons_Database' in PLUGIN_URL:
+if '/Addon_Header' in PLUGIN_URL:
+	ADDON.openSettings()
 
+elif '/Addons_Database' in PLUGIN_URL:
 	Addons_Database()
 
+elif '/Databases_Addon_Data' in PLUGIN_URL:
+	Clean_Databases(ADDON_DATA_PATH)
+
+elif '/Databases_Addons' in PLUGIN_URL:
+	Clean_Databases(ADDONS_PATH)
+
+elif '/Databases_Database' in PLUGIN_URL:
+	Clean_Databases(DATABASE_PATH)
+
+elif '/Databases_Home' in PLUGIN_URL:
+	Clean_Databases(HOME_PATH)
+
+elif '/Databases_Userdata' in PLUGIN_URL:
+	Clean_Databases(USERDATA_PATH)
+
+elif '/Database_Information' in PLUGIN_URL:
+	Database_Information()
 
 elif '/Exit_Only' in PLUGIN_URL:
-
 	xbmc.executebuiltin('Action(Back)')
-
-	Log(Log_Title + Addons + '[COLOR %s][LIGHT]Finished (Exit Only)[/LIGHT][/COLOR]' % TEXT_DARK, xbmc.LOGINFO)	
-
+	Log(Log_Title + '[COLOR %s]menu > [/COLOR][COLOR %s][LIGHT]Finished (Exit Only)[/LIGHT][/COLOR]' % (TEXT_GENERAL, TEXT_DARK), xbmc.LOGINFO)
 
 elif '/User_Information' in PLUGIN_URL:
-
 	User_Information()
-
 
 else:
 	# Create the menu items.
@@ -232,16 +418,34 @@ else:
 	Equals = xbmcgui.ListItem('[COLOR %s]==================================================[/COLOR]' % TEXT_DIM)
 	Equals.setArt({'fanart': ADDON_FANART, 'thumb': ADDON_FANART})
 
-	Addon_Header = xbmcgui.ListItem('[B]%s[/B]' % Addon_Title)
+	Addon_Header = xbmcgui.ListItem('[B]%s[/B]    S e t t i n g s  >' % Addon_Title)
 	Addon_Header.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	Addons_Database = xbmcgui.ListItem('[COLOR %s]Clean Addons Database  [/COLOR]>' % TEXT_GENERAL)
+	Addons_Database = xbmcgui.ListItem('[COLOR %s]Clean Addons Database:[/COLOR] %s  >' % (TEXT_GENERAL, ADDONS_DB))
 	Addons_Database.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	Exit_Only = xbmcgui.ListItem('[COLOR %s]Exit Only  [/COLOR]>' % TEXT_GENERAL)
+	Databases_Addon_Data = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: addon_data  >' % (TEXT_GENERAL, TEXT_DARK))
+	Databases_Addon_Data.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
+
+	Databases_Addons = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: addons  >' % (TEXT_GENERAL, TEXT_DARK))
+	Databases_Addons.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
+
+	Databases_Database = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: database  >' % (TEXT_GENERAL, TEXT_DARK))
+	Databases_Database.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
+
+	Databases_Home = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: home [COLOR %s](all databases)[/COLOR]  >' % (TEXT_GENERAL, TEXT_DARK, TEXT_DARK))
+	Databases_Home.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
+
+	Databases_Userdata = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: userdata [COLOR %s](all excluding addons)[/COLOR]  >' % (TEXT_GENERAL, TEXT_DARK, TEXT_DARK))
+	Databases_Userdata.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
+
+	Database_Information = xbmcgui.ListItem('Database Information  >')
+	Database_Information.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
+
+	Exit_Only = xbmcgui.ListItem('Exit Only  >')
 	Exit_Only.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	User_Information = xbmcgui.ListItem('[COLOR %s]U s e r   I n f o r m a t i o n  >[/COLOR]' % TEXT_DARK)
+	User_Information = xbmcgui.ListItem('U s e r   I n f o r m a t i o n  >')
 	User_Information.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
 	Addon_Developer = xbmcgui.ListItem('[COLOR %s]Developer: [/COLOR]%s' % (TEXT_DIM, ADDON_DEVELOPER))
@@ -261,9 +465,15 @@ else:
 		PLUGIN_ID,
 		(
 			(PLUGIN_URL, Equals, False),
-			(PLUGIN_URL, Addon_Header, False),
+			(PLUGIN_URL + 'Addon_Header', Addon_Header, False),
 			(PLUGIN_URL, Equals, False),
 			(PLUGIN_URL + 'Addons_Database', Addons_Database, False),
+			(PLUGIN_URL + 'Databases_Addon_Data', Databases_Addon_Data, False),
+			(PLUGIN_URL + 'Databases_Addons', Databases_Addons, False),
+			(PLUGIN_URL + 'Databases_Database', Databases_Database, False),
+			(PLUGIN_URL + 'Databases_Home', Databases_Home, False),
+			(PLUGIN_URL + 'Databases_Userdata', Databases_Userdata, False),
+			(PLUGIN_URL + 'Database_Information', Database_Information, False),
 			(PLUGIN_URL + 'Exit_Only', Exit_Only, False),
 			(PLUGIN_URL, Equals, False),
 			(PLUGIN_URL + 'User_Information', User_Information, False),
