@@ -38,6 +38,7 @@ ADDONS_PATH = 'special://home/addons'
 DATABASE = xbmcvfs.translatePath('special://database/')
 DATABASE_ADDONS = os.path.join(DATABASE, ADDONS_DB)
 DATABASE_PATH = 'special://database/'
+DATABASE_SIZE_HIGHLIGHT = ADDON.getSetting('DATABASE_SIZE_HIGHLIGHT')
 HOME = xbmcvfs.translatePath('special://home/')
 HOME_PATH = 'special://home/'
 NOTIFICATION_DURATION = ADDON.getSetting('NOTIFICATION_DURATION')
@@ -132,7 +133,9 @@ def TextBox(title, msg):
 			self.showDialog()
 
 		def showDialog(self):
+			close = '[COLOR %s]Close[/COLOR]' % TEXT_GENERAL
 			self.getControl(self.title).setLabel(title)
+			self.getControl(self.okbutton).setLabel(close)
 			self.getControl(self.msg).setText(msg)
 			self.setFocusId(self.scrollbar)
 
@@ -179,10 +182,11 @@ def Database_Information():
 	for root, _, files in os.walk(HOME):
 		for file in fnmatch.filter(files, '*.db'):
 			database_path = os.path.join(root, file)
-			database_size = Size_Convert(os.path.getsize(database_path))
-			database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> [/COLOR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, database_size, TEXT_DIM, TEXT_GENERAL, database_path))
+			database_bytes = os.path.getsize(database_path)
+			database_size = Size_Convert(database_bytes)
+			database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> [/COLOR][COLOR %s]%s[/COLOR]' % ((TEXT_VALUE if database_bytes < int(DATABASE_SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, TEXT_DIM, TEXT_GENERAL, database_path))
 
-	database = "\n".join(database_paths)
+	database = "\n\n".join(database_paths)
 
 	database_count, thumbs_count = Database_Count()
 
@@ -214,13 +218,13 @@ Development_Information_Text = '[CR][CR][CR][COLOR %s][B]C o d e - E - M a g p i
 # FUNCTION: User_Information
 # ============================================================
 
-INSTRUCTIONS_TEXT = 'I N S T R U C T I O N S[CR][CR]Open the add-on to access the menu.[CR]Select one of the \'>\' menu items and follow the user information.[CR][CR]\'Database Toolbox Settings >\' user settings:[CR]• \'Clean Databases (folder)\' options set dialogue boxes on / off[CR]• \'Clean Databases (folder)\' options set notifications on / off[CR]• set notification duration[CR]• customise text colours with trillions of text colour combinations[CR][CR]\'Clean Addons Database\' has a \'Would you like to continue ?\' option to exit before processing begins (see \'N O T E S\' below).[CR][CR]\'Clean Databases (folder)\' options exclude \'Thumbs.db\' files.[CR]\'Clean Databases (folder): home >\' includes all databases but excludes \'Thumbs.db\' files.[CR]\'Clean Databases (folder): userdata >\' includes all databases but excludes addons and \'Thumbs.db\' files.[CR][CR]\'Database Information >\' includes \'Thumbs.db\' files in the \'Database Count\' for completeness.[CR]There is a separate total for \'Thumbs.db files\' and a list of databases (Database Size and Full Path).[CR][CR]\'Exit Only >\' exits the add-on.'
+INSTRUCTIONS_TEXT = 'I N S T R U C T I O N S[CR][CR]Open the add-on to access the menu.[CR]Select one of the \'>\' menu items and follow the user information.[CR][CR]\'Database Toolbox Settings >\' user settings:[CR]• Database size highlight above value set (default = 1048576 i.e. 1 MB)[CR]• \'Clean Databases (folder)\' options set dialogue boxes on / off[CR]• \'Clean Databases (folder)\' options set notifications on / off[CR]• set notification duration[CR]• customise text colours with trillions of text colour combinations[CR][CR]\'Clean Addons Database\' has a \'Would you like to continue ?\' option to exit before processing begins (see \'N O T E S\' below).[CR][CR]\'Clean Databases (folder)\' options exclude \'Thumbs.db\' files.[CR]\'Clean Databases (folder): home >\' includes all databases but excludes \'Thumbs.db\' files.[CR]\'Clean Databases (folder): userdata >\' includes all databases but excludes addons and \'Thumbs.db\' files.[CR][CR]\'Database Information >\' includes \'Thumbs.db\' files in the \'Database Count\' for completeness.[CR]There is a separate total for \'Thumbs.db files\' and a list of databases (Database Size and Full Path).[CR][CR]\'Exit Only >\' exits the add-on.'
 
 NOTES_TEXT = '[CR][CR][CR]N O T E S[CR][CR]It is important to proceed carefully so changes can be reversed if necessary i.e. \'Clean Addons Database\' closes Kodi without cleanup at the end.[CR][CR]• Backup databases using Kodi file manager or a backup add-on.[CR]• Close other add-ons and save any changes.[CR]• Restart Kodi if required.[CR][CR]ln everyday use the Textures13.db can get corrupted and prevent Kodi starting. Deleting the Textures13.db database resolves this as it rebuilds on startup.[CR]Other databases such as the add-ons database do not rebuild and may require restoring from backup if startup fails.[CR][CR]Later versions of Android make restoring a backedup database difficult.[CR]Android prevents users accessing the Data folder containing data for all the installed apps including Kodi and its databases.[CR]Access is possible using a file explorer app from the Play Store such as Total Commander.[CR]The app needs to be used with the Shizuku app from the Play Store or if restricted from GitHub https://github.com/RikkaApps/Shizuku'
 
 DEVELOPMENT_TEXT = '[CR][CR][CR]D E V E L O P M E N T[CR][CR]Kodi v21.3 Omega apk (Android app) with Confluence skin as default (including default font).[CR]Tablet (1340 x 800 aspect ratio 5:3) running Android 14 using QuickEdit apk (TryItAndSee / LearnAsYouGo iterative development and testing).[CR]Chromecast HD (1280 x 720 aspect ratio 16:9) running Android TV OS version 14 (user testing).[CR]100% tested and working on Android.[CR]Not tested on other platforms.[CR]Code debugged and reengineered where required using https://aipy.dev/tools'
 
-CHANGELOG_TEXT = '[CR][CR][CR]C H A N G E L O G [LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 1.10.0 (10 menu items)[CR]- code added from OpenWizard 2.0.7 by drinfernoo & slamious (plugin.program.openwizard)[CR]- Clean Databases created[CR]- Database Information created[CR]- variables and functions reworked[CR]- menu, multiselect dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR]- added user settings for dialogue boxes, notifications, notification duration and trillions of text colour combinations[CR][CR]version 1.3.1 (3 menu items)[CR]- database variable added[CR]- dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- Clean Addons Database created[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information added (instructions, notes, development and changelog)'
+CHANGELOG_TEXT = '[CR][CR][CR]C H A N G E L O G [LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 2.10.1 (10 menu items)[CR]- added text colour customisation to text boxes and buttons[CR]- added pre clean database size to dialogue boxes (\'Clean Databases (folder)\' options)[CR]- added database size highlight above value set in settings[CR]- database information formatting reworked[CR]- minor changes to improve consistency with other add-ons[CR][CR]version 2.10.0 (10 menu items)[CR]- code added from OpenWizard 2.0.7 by drinfernoo & slamious (plugin.program.openwizard)[CR]- Clean Databases created[CR]- Database Information created[CR]- variables and functions reworked[CR]- menu, multiselect dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR]- added user settings for dialogue boxes, notifications, notification duration and trillions of text colour combinations[CR][CR]version 1.3.1 (3 menu items)[CR]- database variable added[CR]- dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- Clean Addons Database created[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information added (instructions, notes, development and changelog)'
 
 User_Information_Text = '[COLOR %s][B]U S E R   I N F O R M A T I O N[/B][CR][COLOR %s][LIGHT](Instructions / Notes / Development / Changelog)[/LIGHT][/COLOR][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, TEXT_VALUE, TEXT_GENERAL, (INSTRUCTIONS_TEXT + NOTES_TEXT + DEVELOPMENT_TEXT + CHANGELOG_TEXT))
 
@@ -259,7 +263,6 @@ def Addons_Database():
 		success = True
 
 	except sqlite3.Error as e:
-
 		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Unable to clean addons database: [/COLOR][COLOR %s]%s[/COLOR][CR]See Kodi System Log for details.[CR]The database may not exsist.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, ADDONS_DB))
 		Log(Log_Title + Addons + 'database read error: %s may not exist[CR]%s' % (ADDONS_DB, str(e)), xbmc.LOGERROR)
 		return ''
@@ -308,10 +311,11 @@ def Clean_Databases(folder_path):
 		for file in fnmatch.filter(files, '*.db'):
 			if file != 'Thumbs.db':
 				database_path = os.path.join(root, file)
-				database_size = Size_Convert(os.path.getsize(database_path))
+				database_bytes = os.path.getsize(database_path)
+				database_size = Size_Convert(database_bytes)
 				path = database_path.replace('\\', '/').split('/')
 				database.append(database_path)
-				database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> %s > [/COLOR]%s' % (TEXT_ITEM, database_size, TEXT_DIM, path[len(path)-2], path[len(path)-1]))
+				database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> %s > [/COLOR]%s' % ((TEXT_VALUE if database_bytes < int(DATABASE_SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, TEXT_DIM, path[len(path)-2], path[len(path)-1]))
 
 	choice = Dialogue.multiselect(Addon_Title + "[COLOR %s][LIGHT]   (select one or more databases from the list)[/LIGHT][/COLOR]" % TEXT_GENERAL, database_paths, 0, [], False)
 
@@ -336,6 +340,7 @@ def Database_Cleaner(database_selected):
 	Log(Log_Title + Db + 'clean: %s' % database_selected, xbmc.LOGINFO)
 
 	if os.path.exists(database_selected):
+		database_size_before = Size_Convert(os.path.getsize(database_selected))
 		try:
 			textdb = sqlite3.connect(database_selected)
 			textexe = textdb.cursor()
@@ -351,13 +356,13 @@ def Database_Cleaner(database_selected):
 	textexe.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
 	for table in textexe.fetchall():
 		if table[0] == 'version':
-			Log(Log_Title + Db + 'database table skipped: %s' % table[0], xbmc.LOGDEBUG)
+			Log(Log_Title + Db + 'database table skipped: %s' % table[0], xbmc.LOGINFO)
 
 		else:
 			try:
 				textexe.execute("DELETE FROM %s" % table[0])
 				textdb.commit()
-				Log(Log_Title + Db + 'database table data cleared: %s' % table[0], xbmc.LOGDEBUG)
+				Log(Log_Title + Db + 'database table data cleared: %s' % table[0], xbmc.LOGINFO)
 
 			except Exception as e:
 				Log(Log_Title + Db + 'database remove table error: %s[CR]%s' % (table[0], str(e)), xbmc.LOGERROR)
@@ -365,13 +370,13 @@ def Database_Cleaner(database_selected):
 	database_path = database_selected.replace('\\', '/').split('/')
 	database = ('[COLOR %s] > %s > [/COLOR][COLOR %s]%s[/COLOR]' % (TEXT_DIM, database_path[len(database_path)-2], TEXT_DARK, database_path[len(database_path)-1]))
 	textexe.close()
-	
-	database_size = Size_Convert(os.path.getsize(database_selected))
+	database_bytes = os.path.getsize(database_selected)
+	database_size = Size_Convert(database_bytes)
 
 	if ADDON.getSetting('NOTIFICATIONS') == 'true':
 		Notification(Addon_Title, '[COLOR %s]Database Cleaner: %s[/COLOR]' % (TEXT_GENERAL, database))
 	if ADDON.getSetting('DIALOGUE_BOXES') == 'true':
-		Dialogue.ok(Addon_Title, '[COLOR %s]Database Cleaner: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]%s[/COLOR]%s[CR][COLOR %s]%s[/COLOR][CR][/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, database_size, database, TEXT_GENERAL, database_selected))
+		Dialogue.ok(Addon_Title, '[COLOR %s]Database Cleaner: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]%s[/COLOR]%s[COLOR %s][LIGHT] (%s)[/LIGHT][/COLOR][CR]%s[/COLOR]' % (TEXT_GENERAL, (TEXT_VALUE if database_bytes < int(DATABASE_SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, database, TEXT_DARK, database_size_before, database_selected))
 	Log(Log_Title + Db + 'clean: %s done' % database_selected, xbmc.LOGINFO)
 
 #####################################################################################
@@ -457,7 +462,7 @@ else:
 	Addon_Version = xbmcgui.ListItem('[COLOR %s]Version: %s[/COLOR]' % (TEXT_DIM, ADDON_VERSION))
 	Addon_Version.setArt({'fanart': ADDON_FANART, 'thumb': ADDON_ICON})
 
-	Addon_ID = xbmcgui.ListItem('[COLOR %s]Addon ID: %s[/COLOR]' % (TEXT_DIM, ADDON_ID))
+	Addon_ID = xbmcgui.ListItem('[COLOR %s]Add-on ID: %s[/COLOR]' % (TEXT_DIM, ADDON_ID))
 	Addon_ID.setArt({'fanart': ADDON_FANART, 'thumb': ADDON_ICON})
 
 	# Append to PLUGIN_URL as it already ends with a slash.
