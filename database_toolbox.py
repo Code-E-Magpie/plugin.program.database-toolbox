@@ -65,12 +65,13 @@ Dialogue = xbmcgui.Dialog()
 Log_Title = ('[COLOR %s]%s [/COLOR]' % (TEXT_ADDON, ADDON_NAME))
 
 # ============================================================
-# Addons / Clean / Db
+# Addons / Clean / Db / Menu
 # ============================================================
 
 Addons = ('[COLOR %s]addons > [/COLOR]' % TEXT_GENERAL)
 Clean = ('[COLOR %s]clean > [/COLOR]' % TEXT_GENERAL)
 Db = ('[COLOR %s]db > [/COLOR]' % TEXT_GENERAL)
+Menu = ('[COLOR %s]menu > [/COLOR]' % TEXT_GENERAL)
 
 # ============================================================
 # FUNCTION: Log
@@ -412,15 +413,16 @@ elif '/Database_Information' in PLUGIN_URL:
 
 elif '/Exit_Only' in PLUGIN_URL:
 	xbmc.executebuiltin('Action(Back)')
-	Log(Log_Title + '[COLOR %s]menu > [/COLOR][COLOR %s][LIGHT]Finished (Exit Only)[/LIGHT][/COLOR]' % (TEXT_GENERAL, TEXT_DARK), xbmc.LOGINFO)
+	Log(Log_Title + Menu + '[COLOR %s][LIGHT]Finished (Exit Only)[/LIGHT][/COLOR]' % TEXT_DARK, xbmc.LOGINFO)
 
 elif '/User_Information' in PLUGIN_URL:
 	User_Information()
 
 else:
 	# Create the menu items.
+	Log(Log_Title + Menu + '[COLOR %s][LIGHT]Started[/LIGHT][/COLOR]' % TEXT_DARK, xbmc.LOGINFO)
 	xbmcplugin.setContent(PLUGIN_ID, 'files')
-
+	
 	Equals = xbmcgui.ListItem('[COLOR %s]==================================================[/COLOR]' % TEXT_DIM)
 	Equals.setArt({'fanart': ADDON_FANART, 'thumb': ADDON_FANART})
 
