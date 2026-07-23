@@ -37,13 +37,13 @@ ADDONS_PATH = 'special://home/addons'
 DATABASE = xbmcvfs.translatePath('special://database/')
 DATABASE_ADDONS = os.path.join(DATABASE, ADDONS_DB)
 DATABASE_PATH = 'special://database/'
-DATABASE_SIZE_HIGHLIGHT = ADDON.getSetting('DATABASE_SIZE_HIGHLIGHT')
-DATABASE_SPACER_ROW = ADDON.getSetting('DATABASE_SPACER_ROW')
 HOME = xbmcvfs.translatePath('special://home/')
 HOME_PATH = 'special://home/'
 NOTIFICATION_DURATION = ADDON.getSetting('NOTIFICATION_DURATION')
 PLUGIN_ID = int(sys.argv[1])
 PLUGIN_URL = sys.argv[0]
+SIZE_HIGHLIGHT = ADDON.getSetting('SIZE_HIGHLIGHT')
+SPACER_ROW = ADDON.getSetting('SPACER_ROW')
 TEXT_ADDON = ADDON.getSetting('TEXT_ADDON')
 TEXT_DARK = ADDON.getSetting('TEXT_DARK')
 TEXT_DIM = ADDON.getSetting('TEXT_DIM')
@@ -185,9 +185,9 @@ def Database_Information():
 			database_path = os.path.join(root, file)
 			database_bytes = os.path.getsize(database_path)
 			database_size = Size_Convert(database_bytes)
-			database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> [/COLOR][COLOR %s]%s[/COLOR]' % ((TEXT_VALUE if database_bytes < int(DATABASE_SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, TEXT_DIM, TEXT_GENERAL, database_path))
+			database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> [/COLOR][COLOR %s]%s[/COLOR]' % ((TEXT_VALUE if database_bytes < int(SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, TEXT_DIM, TEXT_GENERAL, database_path))
 
-	database = "\n\n".join(database_paths) if DATABASE_SPACER_ROW == 'true' else "\n".join(database_paths)
+	database = "\n\n".join(database_paths) if SPACER_ROW == 'true' else "\n".join(database_paths)
 
 	database_count, thumbs_count = Database_Count()
 
@@ -219,13 +219,13 @@ Development_Information_Text = '[CR][CR][CR][COLOR %s][B]%s[/B][CR][COLOR %s][LI
 # FUNCTION: User_Information
 # ============================================================
 
-INSTRUCTIONS_TEXT = '%s[CR][CR]Open the add-on to access the menu.[CR]Select one of the \'>\' menu items and follow the user information.[CR][CR]\'Database Toolbox Settings >\' user settings:[CR]• Database size highlight above value set (default = 1048576 i.e. 1 MB)[CR]• Database Information spacer row on / off[CR]• \'Clean Databases (folder)\' options set dialogue boxes on / off[CR]• \'Clean Databases (folder)\' options set notifications on / off[CR]• set notification duration[CR]• customise text colours with trillions of text colour combinations[CR][CR]\'Clean Addons Database\' has a \'Would you like to continue ?\' option to exit before processing begins (see \'%s\' below).[CR][CR]\'Clean Databases (folder)\' options exclude \'Thumbs.db\' files.[CR]\'Clean Databases (folder): home >\' includes all databases but excludes \'Thumbs.db\' files.[CR]\'Clean Databases (folder): userdata >\' includes all databases but excludes addons and \'Thumbs.db\' files.[CR][CR]\'Database Information >\' includes \'Thumbs.db\' files in the \'Database Count\' for completeness.[CR]There is a separate total for \'Thumbs.db files\' and a list of databases (Database Size and Full Path).[CR][CR]\'Exit Only >\' exits the add-on.' % (' '.join('INSTRUCTIONS'), ' '.join('NOTES'))
+INSTRUCTIONS_TEXT = '%s[CR][CR]Open the add-on to access the menu.[CR]Select one of the \'>\' menu items and follow the user information.[CR][CR]\'Database Toolbox Settings >\' user settings:[CR]• Size highlight above value set (default = 1048576 i.e. 1 MB)[CR]• Spacer row on / off[CR]• \'Clean Databases (folder)\' options set dialogue boxes on / off[CR]• \'Clean Databases (folder)\' options set notifications on / off[CR]• set notification duration[CR]• customise text colours with trillions of text colour combinations[CR][CR]\'Clean Addons Database\' has a \'Would you like to continue ?\' option to exit before processing begins (see \'%s\' below).[CR][CR]\'Clean Databases (folder)\' options exclude \'Thumbs.db\' files.[CR]\'Clean Databases (folder): home >\' includes all databases but excludes \'Thumbs.db\' files.[CR]\'Clean Databases (folder): userdata >\' includes all databases but excludes addons and \'Thumbs.db\' files.[CR][CR]\'Database Information >\' includes \'Thumbs.db\' files in the \'Database Count\' for completeness.[CR]There is a separate total for \'Thumbs.db files\' and a list of databases (Database Size and Full Path).[CR][CR]\'Exit Only >\' exits the add-on.' % (' '.join('INSTRUCTIONS'), ' '.join('NOTES'))
 
 NOTES_TEXT = '[CR][CR][CR]%s[CR][CR]It is important to proceed carefully so changes can be reversed if necessary i.e. \'Clean Addons Database\' closes Kodi without cleanup at the end.[CR][CR]• Backup databases using Kodi file manager or a backup add-on.[CR]• Close other add-ons and save any changes.[CR]• Restart Kodi if required.[CR][CR]ln everyday use the Textures13.db can get corrupted and prevent Kodi starting. Deleting the Textures13.db database resolves this as it rebuilds on startup.[CR]Other databases such as the add-ons database do not rebuild and may require restoring from backup if startup fails.[CR][CR]Later versions of Android make restoring a backedup database difficult.[CR]Android prevents users accessing the Data folder containing data for all the installed apps including Kodi and its databases.[CR]Access is possible using a file explorer app from the Play Store such as Total Commander.[CR]The app needs to be used with the Shizuku app from the Play Store or if restricted from GitHub https://github.com/RikkaApps/Shizuku' % ' '.join('NOTES')
 
 DEVELOPMENT_TEXT = '[CR][CR][CR]%s[CR][CR]Kodi v21.3 Omega apk (Android app) with Confluence skin as default (including default font).[CR]Tablet (1340 x 800 aspect ratio 5:3) running Android 14 using QuickEdit apk (TryItAndSee / LearnAsYouGo iterative development and testing).[CR]Chromecast HD (1280 x 720 aspect ratio 16:9) running Android TV OS version 14 (user testing).[CR]100%% tested and working on Android.[CR]Not tested on other platforms.[CR]Code debugged and reengineered where required using https://aipy.dev/tools' % ' '.join('DEVELOPMENT')
 
-CHANGELOG_TEXT = '[CR][CR][CR]%s[LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 2.10.1 (10 menu items)[CR]- added text colour customisation to text boxes and buttons[CR]- added pre clean database size to dialogue boxes (\'Clean Databases (folder)\' options)[CR]- added database size highlight above value set in settings[CR]- database information formatting reworked with insert spacer row option in settings[CR]- minor changes to improve consistency with other add-ons[CR][CR]version 2.10.0 (10 menu items)[CR]- code added from OpenWizard 2.0.7 by drinfernoo & slamious (plugin.program.openwizard)[CR]- Clean Databases created[CR]- Database Information created[CR]- variables and functions reworked[CR]- menu, multiselect dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR]- added user settings for dialogue boxes, notifications, notification duration and trillions of text colour combinations[CR][CR]version 1.3.1 (3 menu items)[CR]- database variable added[CR]- dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by %s (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- Clean Addons Database created[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information added (instructions, notes, development and changelog)' % (' '.join('CHANGELOG'), ADDON_DEVELOPER)
+CHANGELOG_TEXT = '[CR][CR][CR]%s[LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 2.10.1 (10 menu items)[CR]- added text colour customisation to text boxes and buttons[CR]- added pre clean database size to dialogue boxes (\'Clean Databases (folder)\' options)[CR]- database information formatting reworked[CR]- added spacer row and size highlight above value set in settings[CR]- minor changes to improve consistency with other add-ons[CR][CR]version 2.10.0 (10 menu items)[CR]- code added from OpenWizard 2.0.7 by drinfernoo & slamious (plugin.program.openwizard)[CR]- Clean Databases created[CR]- Database Information created[CR]- variables and functions reworked[CR]- menu, multiselect dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR]- added user settings for dialogue boxes, notifications, notification duration and trillions of text colour combinations[CR][CR]version 1.3.1 (3 menu items)[CR]- database variable added[CR]- dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by %s (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- Clean Addons Database created[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information added (instructions, notes, development and changelog)' % (' '.join('CHANGELOG'), ADDON_DEVELOPER)
 
 User_Information_Text = '[COLOR %s][B]%s[/B][CR][COLOR %s][LIGHT](Instructions / Notes / Development / Changelog)[/LIGHT][/COLOR][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, ' '.join('USER INFORMATION'), TEXT_VALUE, TEXT_GENERAL, (INSTRUCTIONS_TEXT + NOTES_TEXT + DEVELOPMENT_TEXT + CHANGELOG_TEXT))
 
@@ -316,7 +316,7 @@ def Clean_Databases(folder_path):
 				database_size = Size_Convert(database_bytes)
 				path = database_path.replace('\\', '/').split('/')
 				database.append(database_path)
-				database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> %s > [/COLOR]%s' % ((TEXT_VALUE if database_bytes < int(DATABASE_SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, TEXT_DIM, path[len(path)-2], path[len(path)-1]))
+				database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> %s > [/COLOR]%s' % ((TEXT_VALUE if database_bytes < int(SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, TEXT_DIM, path[len(path)-2], path[len(path)-1]))
 
 	choice = Dialogue.multiselect(Addon_Title + "[COLOR %s][LIGHT]   (select one or more databases from the list)[/LIGHT][/COLOR]" % TEXT_GENERAL, database_paths, 0, [], False)
 
@@ -377,7 +377,7 @@ def Database_Cleaner(database_selected):
 	if ADDON.getSetting('NOTIFICATIONS') == 'true':
 		Notification(Addon_Title, '[COLOR %s]Database Cleaner: %s[/COLOR]' % (TEXT_GENERAL, database))
 	if ADDON.getSetting('DIALOGUE_BOXES') == 'true':
-		Dialogue.ok(Addon_Title, '[COLOR %s]Database Cleaner: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]%s[/COLOR]%s[COLOR %s][LIGHT] (%s)[/LIGHT][/COLOR][CR]%s[/COLOR]' % (TEXT_GENERAL, (TEXT_VALUE if database_bytes < int(DATABASE_SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, database, TEXT_DARK, database_size_before, database_selected))
+		Dialogue.ok(Addon_Title, '[COLOR %s]Database Cleaner: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]%s[/COLOR]%s[COLOR %s][LIGHT] (%s)[/LIGHT][/COLOR][CR]%s[/COLOR]' % (TEXT_GENERAL, (TEXT_VALUE if database_bytes < int(SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, database, TEXT_DARK, database_size_before, database_selected))
 	Log(Log_Title + Db + 'clean: %s done' % database_selected, xbmc.LOGINFO)
 
 #####################################################################################
