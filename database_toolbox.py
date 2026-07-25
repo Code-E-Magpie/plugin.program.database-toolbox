@@ -318,7 +318,7 @@ def Clean_Databases(folder_path):
 				database.append(database_path)
 				database_paths.append('[COLOR %s]%s[/COLOR][COLOR %s]\t> %s > [/COLOR]%s' % ((TEXT_VALUE if database_bytes < int(SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, TEXT_DIM, path[len(path)-2], path[len(path)-1]))
 
-	choice = Dialogue.multiselect(Addon_Title + "[COLOR %s][LIGHT]   (select one or more databases from the list)[/LIGHT][/COLOR]" % TEXT_GENERAL, database_paths, 0, [], False)
+	choice = Dialogue.multiselect(Addon_Title + "[COLOR %s][LIGHT]   (select one or more from the list)[/LIGHT][/COLOR]" % TEXT_GENERAL, database_paths, 0, [], False)
 
 	if choice == None:
 		Log(Log_Title + Clean + '[COLOR %s][LIGHT]Cancelled (clean databases: %s)[/LIGHT][/COLOR]' % (TEXT_DARK, folder_path), xbmc.LOGINFO)
@@ -375,9 +375,9 @@ def Database_Cleaner(database_selected):
 	database_size = Size_Convert(database_bytes)
 
 	if ADDON.getSetting('NOTIFICATIONS') == 'true':
-		Notification(Addon_Title, '[COLOR %s]Database Cleaner: %s[/COLOR]' % (TEXT_GENERAL, database))
+		Notification(Addon_Title, '[COLOR %s]Clean Databases: %s[/COLOR]' % (TEXT_GENERAL, database))
 	if ADDON.getSetting('DIALOGUE_BOXES') == 'true':
-		Dialogue.ok(Addon_Title, '[COLOR %s]Database Cleaner: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]%s[/COLOR]%s[COLOR %s][LIGHT] (%s)[/LIGHT][/COLOR][CR]%s[/COLOR]' % (TEXT_GENERAL, (TEXT_VALUE if database_bytes < int(SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, database, TEXT_DARK, database_size_before, database_selected))
+		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Databases: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]%s[/COLOR]%s[COLOR %s][LIGHT] (%s)[/LIGHT][/COLOR][CR]%s[/COLOR]' % (TEXT_GENERAL, (TEXT_VALUE if database_bytes < int(SIZE_HIGHLIGHT) else TEXT_HIGHLIGHT), database_size, database, TEXT_DARK, database_size_before, database_selected))
 	Log(Log_Title + Db + 'clean: %s done' % database_selected, xbmc.LOGINFO)
 
 #####################################################################################
