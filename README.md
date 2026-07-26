@@ -28,7 +28,7 @@ Android prevents users accessing the Data folder containing data for all the ins
 Access is possible using a file explorer app from the Play Store such as Total Commander.<br/>The app needs to be used with the Shizuku app from the Play Store or if restricted from GitHub https://github.com/RikkaApps/Shizuku
 
 
-# Development
+# Development environment
 Kodi v21.3 Omega apk (Android app) with Confluence skin as default (including default font).
 
 Tablet (1340 x 800 aspect ratio 5:3) running Android 14 using QuickEdit apk (TryItAndSee / LearnAsYouGo iterative development and testing).
