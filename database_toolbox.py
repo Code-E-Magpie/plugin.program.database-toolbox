@@ -205,9 +205,9 @@ def Addons_Database():
 	Log(Log_Title + Addons + '[COLOR %s][LIGHT]Started (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, ADDONS_DB), xbmc.LOGINFO)
 	success = False
 
-	Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Backup %s database before proceeding.[/COLOR][CR]Close other add-ons and save any changes.[CR]Restart Kodi if required.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, ADDONS_DB))
+	Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Close other add-ons and save any changes.[CR]Restart Kodi if required.[/LIGHT][/COLOR][CR]Backup %s database before proceeding.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, ADDONS_DB))
 
-	addons_choice = Dialogue.yesno(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Kodi will need to close without cleanup at the end.[/COLOR][CR][CR]Would you like to continue ?[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM), yeslabel = ('[COLOR %s]Clean Database[/COLOR]' % TEXT_VALUE), nolabel = ('[COLOR %s]Cancel Clean[/COLOR]' % TEXT_HIGHLIGHT))
+	addons_choice = Dialogue.yesno(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Kodi will need to close without cleanup at the end.[/LIGHT][/COLOR][CR][CR]Would you like to continue ?[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM), yeslabel = ('[COLOR %s]Clean Database[/COLOR]' % TEXT_VALUE), nolabel = ('[COLOR %s]Cancel Clean[/COLOR]' % TEXT_HIGHLIGHT))
 
 	if not addons_choice:
 		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Cancelled (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, ADDONS_DB), xbmc.LOGINFO)
@@ -226,7 +226,7 @@ def Addons_Database():
 		success = True
 
 	except sqlite3.Error as e:
-		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Unable to clean addons database: [/COLOR][COLOR %s]%s[/COLOR][CR]See Kodi System Log for details.[CR]The database may not exsist.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, ADDONS_DB))
+		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Unable to clean addons database: [COLOR %s]%s[/COLOR][CR]See Kodi System Log for details.[/LIGHT][/COLOR][CR]The database may not exsist.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, ADDONS_DB))
 		Log(Log_Title + Addons + 'database read error: %s may not exist[CR]%s' % (ADDONS_DB, str(e)), xbmc.LOGERROR)
 		return ''
 
@@ -256,7 +256,7 @@ def Addons_Database():
 			pass
 
 	if success is True:
-		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[/LIGHT][CR][COLOR %s]Cleaned addons database: [/COLOR][COLOR %s]%s[/COLOR][CR]Kodi will need to close without cleanup.[CR]Press OK to continue.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, ADDONS_DB))
+		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Cleaned addons database: [COLOR %s]%s[/COLOR][CR]Kodi will need to close without cleanup.[/LIGHT][/COLOR][CR]Press OK to continue.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, ADDONS_DB))
 		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Finished (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, ADDONS_DB), xbmc.LOGINFO)
 		os._exit(1)
 
