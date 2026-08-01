@@ -18,7 +18,7 @@
 # ============================================================
 
 import xbmc, xbmcaddon, xbmcgui, xbmcplugin, xbmcvfs
-import fnmatch, os, sqlite3, sys
+import fnmatch, glob, os, re, sqlite3, sys
 
 # ============================================================
 # Variables
@@ -32,10 +32,8 @@ ADDON_FANART = ADDON.getAddonInfo('fanart')
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_NAME = ADDON.getAddonInfo('name') # name in addons.xml
 ADDON_VERSION = ADDON.getAddonInfo('version') # version in addons.xml
-ADDONS_DB = 'Addons33.db'
 ADDONS_PATH = 'special://home/addons'
 DATABASE = xbmcvfs.translatePath('special://database/')
-DATABASE_ADDONS = os.path.join(DATABASE, ADDONS_DB)
 DATABASE_PATH = 'special://database/'
 HOME = xbmcvfs.translatePath('special://home/')
 HOME_PATH = 'special://home/'
@@ -187,7 +185,7 @@ NOTES_TEXT = '[CR][CR][CR]%s[CR][CR]It is important to proceed carefully so chan
 
 ENVIRONMENT_TEXT = '[CR][CR][CR]%s[CR][CR]Kodi v21.3 Omega apk (Android app) with Confluence skin as default (including default font).[CR]Tablet (1340 x 800 aspect ratio 5:3) running Android 14 using QuickEdit apk (TryItAndSee / LearnAsYouGo iterative development and testing).[CR]Chromecast HD (1280 x 720 aspect ratio 16:9) running Android TV OS version 14 (user testing).[CR]100%% tested and working on Android.[CR]Not tested on other platforms.[CR]Code debugged and reengineered using https://aipy.dev/tools where required.' % ' '.join('DEVELOPMENT ENVIRONMENT')
 
-CHANGELOG_TEXT = '[CR][CR][CR]%s[LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 2.10.1 (10 menu items)[CR]- added text colour customisation to text boxes and buttons[CR]- added pre clean database size to dialogue boxes (\'Clean Databases (folder)\' options)[CR]- database information formatting reworked and renamed \'Database Files (.db file list) >\'[CR]- added spacer row and size highlight above value set in settings[CR]- minor changes to improve consistency with other add-ons[CR][CR]version 2.10.0 (10 menu items)[CR]- code added from OpenWizard 2.0.7 by drinfernoo & slamious (plugin.program.openwizard)[CR]- Clean Databases created[CR]- Database Information created[CR]- variables and functions reworked[CR]- menu, multiselect dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR]- added user settings for dialogue boxes, notifications, notification duration and trillions of text colour combinations[CR][CR]version 1.3.1 (3 menu items)[CR]- database variable added[CR]- dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by %s (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- Clean Addons Database created[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information added (instructions, notes, development and changelog)' % (' '.join('CHANGELOG'), ADDON_DEVELOPER)
+CHANGELOG_TEXT = '[CR][CR][CR]%s[LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 2.10.2 (10 menu items)[CR]- Clean Addons Database futureproofing added to select Addons*.db[CR]- minor changes to menu formatting[CR][CR]version 2.10.1 (10 menu items)[CR]- added text colour customisation to text boxes and buttons[CR]- added pre clean database size to dialogue boxes (\'Clean Databases (folder)\' options)[CR]- database information formatting reworked and renamed \'Database Files (.db file list) >\'[CR]- added spacer row and size highlight above value set in settings[CR]- minor changes to improve consistency with other add-ons[CR][CR]version 2.10.0 (10 menu items)[CR]- code added from OpenWizard 2.0.7 by drinfernoo & slamious (plugin.program.openwizard)[CR]- Clean Databases created[CR]- Database Information created[CR]- variables and functions reworked[CR]- menu, multiselect dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR]- added user settings for dialogue boxes, notifications, notification duration and trillions of text colour combinations[CR][CR]version 1.3.1 (3 menu items)[CR]- database variable added[CR]- dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by %s (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- Clean Addons Database created[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information added (instructions, notes, development and changelog)' % (' '.join('CHANGELOG'), ADDON_DEVELOPER)
 
 User_Information_Text = '[COLOR %s][B]%s[/B][CR][COLOR %s][LIGHT](Instructions / Notes / Development Environment / Changelog)[/LIGHT][/COLOR][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, ' '.join('USER INFORMATION'), TEXT_VALUE, TEXT_GENERAL, (INSTRUCTIONS_TEXT + NOTES_TEXT + ENVIRONMENT_TEXT + CHANGELOG_TEXT))
 
@@ -202,62 +200,79 @@ def User_Information():
 
 def Addons_Database():
 
-	Log(Log_Title + Addons + '[COLOR %s][LIGHT]Started (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, ADDONS_DB), xbmc.LOGINFO)
+	pattern = re.compile(r'Addons(\d+)\.db$', re.IGNORECASE)
+	matches = glob.glob(os.path.join(DATABASE, 'Addons*.db'))
+	highest = 0
+
+	for file in matches:
+		basename = os.path.basename(file)
+		file_match = pattern.search(basename)
+		if file_match:
+			try:
+				number = int(file_match.group(1))
+			except ValueError:
+				continue
+			if number > highest:
+				highest = number
+
+	addons_db = "Addons%s.db" % highest
+
+	Log(Log_Title + Addons + '[COLOR %s][LIGHT]Started (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, addons_db), xbmc.LOGINFO)
 	success = False
 
-	Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Close other add-ons and save any changes.[CR]Restart Kodi if required.[/LIGHT][/COLOR][CR]Backup %s database before proceeding.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, ADDONS_DB))
+	Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Close other add-ons and save any changes.[CR]Restart Kodi if required.[/LIGHT][/COLOR][CR]Backup %s database before proceeding.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, addons_db))
 
 	addons_choice = Dialogue.yesno(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Kodi will need to close without cleanup at the end.[/LIGHT][/COLOR][CR][CR]Would you like to continue ?[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM), yeslabel = ('[COLOR %s]Clean Database[/COLOR]' % TEXT_VALUE), nolabel = ('[COLOR %s]Cancel Clean[/COLOR]' % TEXT_HIGHLIGHT))
 
 	if not addons_choice:
-		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Cancelled (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, ADDONS_DB), xbmc.LOGINFO)
+		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Cancelled (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, addons_db), xbmc.LOGINFO)
 		sys.exit()
 
 	try:
-		con = sqlite3.connect(DATABASE_ADDONS)
-		cursor = con.cursor()
+		connection = sqlite3.connect(os.path.join(DATABASE, addons_db))
+		cursor = connection.cursor()
 		cursor.execute('DELETE FROM addonlinkrepo;',)
 		cursor.execute('DELETE FROM addons;',)
 		cursor.execute('DELETE FROM package;',)
 		cursor.execute('DELETE FROM repo;',)
 		cursor.execute('DELETE FROM update_rules;',)
 		cursor.execute('DELETE FROM version;',)
-		con.commit()
+		connection.commit()
 		success = True
 
 	except sqlite3.Error as e:
-		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Unable to clean addons database: [COLOR %s]%s[/COLOR][CR]See Kodi System Log for details.[/LIGHT][/COLOR][CR]The database may not exsist.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, ADDONS_DB))
-		Log(Log_Title + Addons + 'database read error: %s may not exist[CR]%s' % (ADDONS_DB, str(e)), xbmc.LOGERROR)
+		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Unable to clean addons database: [COLOR %s]%s[/COLOR][CR]See Kodi System Log for details.[/LIGHT][/COLOR][CR]The database may not exsist.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, addons_db))
+		Log(Log_Title + Addons + 'database read error: %s may not exist[CR]%s' % (addons_db, str(e)), xbmc.LOGERROR)
 		return ''
 
 	finally:
 		try:
-			if con:
-				con.close()
+			if connection:
+				connection.close()
 
 		except UnboundLocalError as e:
-			Log(Log_Title + Addons + 'database connection error: %s[CR]%s' % (ADDONS_DB, str(e)), xbmc.LOGERROR)
+			Log(Log_Title + Addons + 'database connection error: %s[CR]%s' % (addons_db, str(e)), xbmc.LOGERROR)
 
 	try:
-		con = sqlite3.connect(DATABASE_ADDONS)
-		cursor = con.cursor()
+		connection = sqlite3.connect(os.path.join(DATABASE, addons_db))
+		cursor = connection.cursor()
 		cursor.execute('VACUUM;',)
-		con.commit()
+		connection.commit()
 
 	except sqlite3.Error as e:
-		Log(Log_Title + Addons + 'database table error: %s[CR]%s' % (ADDONS_DB, str(e)), xbmc.LOGERROR)
+		Log(Log_Title + Addons + 'database table error: %s[CR]%s' % (addons_db, str(e)), xbmc.LOGERROR)
 
 	finally:
 		try:
-			if con:
-				con.close()
+			if connection:
+				connection.close()
 
 		except sqlite3.Error:
 			pass
 
 	if success is True:
-		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Cleaned addons database: [COLOR %s]%s[/COLOR][CR]Kodi will need to close without cleanup.[/LIGHT][/COLOR][CR]Press OK to continue.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, ADDONS_DB))
-		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Finished (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, ADDONS_DB), xbmc.LOGINFO)
+		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Cleaned addons database: [COLOR %s]%s[/COLOR][CR]Kodi will need to close without cleanup.[/LIGHT][/COLOR][CR]Press OK to continue.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, addons_db))
+		Log(Log_Title + Addons + '[COLOR %s][LIGHT]Finished (addons database: special://database/%s)[/LIGHT][/COLOR]' % (TEXT_DARK, addons_db), xbmc.LOGINFO)
 		os._exit(1)
 
 # ============================================================
@@ -430,22 +445,22 @@ else:
 	Addon_Header = xbmcgui.ListItem('[B]%s[/B]%s' % (Addon_Title, ' '.join('  Settings >')))
 	Addon_Header.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	Addons_Database = xbmcgui.ListItem('[COLOR %s]Clean Addons Database:[/COLOR] %s  >' % (TEXT_GENERAL, ADDONS_DB))
+	Addons_Database = xbmcgui.ListItem('Clean Addons Database  >')
 	Addons_Database.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	Databases_Addon_Data = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: addon_data  >' % (TEXT_GENERAL, TEXT_DARK))
+	Databases_Addon_Data = xbmcgui.ListItem('[COLOR %s]Clean Databases (folder)[/COLOR]: addon_data  >' % TEXT_DARK)
 	Databases_Addon_Data.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	Databases_Addons = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: addons  >' % (TEXT_GENERAL, TEXT_DARK))
+	Databases_Addons = xbmcgui.ListItem('[COLOR %s]Clean Databases (folder)[/COLOR]: addons  >' % TEXT_DARK)
 	Databases_Addons.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	Databases_Database = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: database  >' % (TEXT_GENERAL, TEXT_DARK))
+	Databases_Database = xbmcgui.ListItem('[COLOR %s]Clean Databases (folder)[/COLOR]: database  >' % TEXT_DARK)
 	Databases_Database.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	Databases_Home = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: home [COLOR %s](all databases)[/COLOR]  >' % (TEXT_GENERAL, TEXT_DARK, TEXT_DARK))
+	Databases_Home = xbmcgui.ListItem('[COLOR %s]Clean Databases (folder)[/COLOR]: home [COLOR %s](all databases)[/COLOR]  >' % (TEXT_DARK, TEXT_DARK))
 	Databases_Home.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	Databases_Userdata = xbmcgui.ListItem('[COLOR %s]Clean Databases [/COLOR][COLOR %s](folder)[/COLOR]: userdata [COLOR %s](all excluding addons)[/COLOR]  >' % (TEXT_GENERAL, TEXT_DARK, TEXT_DARK))
+	Databases_Userdata = xbmcgui.ListItem('[COLOR %s]Clean Databases (folder)[/COLOR]: userdata [COLOR %s](all excluding addons)[/COLOR]  >' % (TEXT_DARK, TEXT_DARK))
 	Databases_Userdata.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
 	Database_Files = xbmcgui.ListItem('Database Files [COLOR %s](.db file list)[/COLOR]  >' % TEXT_DARK)

@@ -1,5 +1,5 @@
 <?xml version = "1.0" encoding = "UTF-8" standalone = "yes"?>
-<addon id = "plugin.program.database-toolbox" name = "Database Toolbox" version = "2.10.1" provider-name = "[B][COLOR silver]C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e[/COLOR][/B]">
+<addon id = "plugin.program.database-toolbox" name = "Database Toolbox" version = "2.10.2" provider-name = "[B][COLOR silver]C[COLOR dimgray]o[/COLOR]d[COLOR dimgray]e[/COLOR]-[COLOR dimgray]E[/COLOR]-[COLOR dimgray]M[/COLOR]a[COLOR dimgray]g[/COLOR]p[COLOR dimgray]i[/COLOR]e[/COLOR][/B]">
 	<requires>
 		<import addon = "xbmc.python" version = "3.0.0"/>
 	</requires>
