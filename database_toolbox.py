@@ -195,10 +195,10 @@ def User_Information():
 #####################################################################################
 
 # ============================================================
-# FUNCTION: Addons_Database
+# FUNCTION: Clean_Addons_Database
 # ============================================================
 
-def Addons_Database():
+def Clean_Addons_Database():
 
 	pattern = re.compile(r'Addons(\d+)\.db$', re.IGNORECASE)
 	matches = glob.glob(os.path.join(DATABASE, 'Addons*.db'))
@@ -406,8 +406,8 @@ def Database_Files():
 if '/Addon_Header' in PLUGIN_URL:
 	ADDON.openSettings()
 
-elif '/Addons_Database' in PLUGIN_URL:
-	Addons_Database()
+elif '/Clean_Addons_Database' in PLUGIN_URL:
+	Clean_Addons_Database()
 
 elif '/Databases_Addon_Data' in PLUGIN_URL:
 	Clean_Databases(ADDON_DATA_PATH)
@@ -445,8 +445,8 @@ else:
 	Addon_Header = xbmcgui.ListItem('[B]%s[/B]%s' % (Addon_Title, ' '.join('  Settings >')))
 	Addon_Header.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
-	Addons_Database = xbmcgui.ListItem('Clean Addons Database  >')
-	Addons_Database.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
+	Clean_Addons_Database = xbmcgui.ListItem('Clean Addons Database  >')
+	Clean_Addons_Database.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
 
 	Databases_Addon_Data = xbmcgui.ListItem('[COLOR %s]Clean Databases (folder)[/COLOR]: addon_data  >' % TEXT_DARK)
 	Databases_Addon_Data.setArt({'fanart': TOOLBOX, 'thumb': ADDON_ICON})
@@ -491,7 +491,7 @@ else:
 			(PLUGIN_URL, Equals, False),
 			(PLUGIN_URL + 'Addon_Header', Addon_Header, False),
 			(PLUGIN_URL, Equals, False),
-			(PLUGIN_URL + 'Addons_Database', Addons_Database, False),
+			(PLUGIN_URL + 'Clean_Addons_Database', Clean_Addons_Database, False),
 			(PLUGIN_URL + 'Databases_Addon_Data', Databases_Addon_Data, False),
 			(PLUGIN_URL + 'Databases_Addons', Databases_Addons, False),
 			(PLUGIN_URL + 'Databases_Database', Databases_Database, False),
