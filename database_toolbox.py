@@ -242,7 +242,7 @@ def Clean_Addons_Database():
 
 	except sqlite3.Error as e:
 		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Unable to clean addons database: [COLOR %s]%s[/COLOR][CR]See Kodi System Log for details.[/LIGHT][/COLOR][CR]The database may not exsist.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, addons_db))
-		Log(Log_Title + Addons + 'database read error: %s may not exist[CR]%s' % (addons_db, str(e)), xbmc.LOGERROR)
+		Log(Log_Title + Addons + '%s read error: %s' % (addons_db, str(e)), xbmc.LOGERROR)
 		return ''
 
 	finally:
@@ -251,7 +251,7 @@ def Clean_Addons_Database():
 				connection.close()
 
 		except UnboundLocalError as e:
-			Log(Log_Title + Addons + 'database connection error: %s[CR]%s' % (addons_db, str(e)), xbmc.LOGERROR)
+			Log(Log_Title + Addons + '%s connection error: %s' % (addons_db, str(e)), xbmc.LOGERROR)
 
 	try:
 		connection = sqlite3.connect(os.path.join(DATABASE, addons_db))
@@ -260,7 +260,7 @@ def Clean_Addons_Database():
 		connection.commit()
 
 	except sqlite3.Error as e:
-		Log(Log_Title + Addons + 'database table error: %s[CR]%s' % (addons_db, str(e)), xbmc.LOGERROR)
+		Log(Log_Title + Addons + '%s table error: %s' % (addons_db, str(e)), xbmc.LOGERROR)
 
 	finally:
 		try:
@@ -325,26 +325,26 @@ def Database_Cleaner(database_selected):
 			textexe = textdb.cursor()
 
 		except Exception as e:
-			Log(Log_Title + Db + 'database connection error: %s[CR]%s' % (database_selected, str(e)), xbmc.LOGERROR)
+			Log(Log_Title + Db + '%s connection error: %s' % (database_selected, str(e)), xbmc.LOGERROR)
 			return False
 
 	else:
-		Log(Log_Title + Db + 'database not found: %s' % database_selected, xbmc.LOGERROR)
+		Log(Log_Title + Db + '%s not found' % database_selected, xbmc.LOGERROR)
 		return False
 
 	textexe.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
 	for table in textexe.fetchall():
 		if table[0] == 'version':
-			Log(Log_Title + Db + 'database table skipped: %s' % table[0], xbmc.LOGINFO)
+			Log(Log_Title + Db + '%s table skipped' % table[0], xbmc.LOGINFO)
 
 		else:
 			try:
 				textexe.execute("DELETE FROM %s" % table[0])
 				textdb.commit()
-				Log(Log_Title + Db + 'database table data cleared: %s' % table[0], xbmc.LOGINFO)
+				Log(Log_Title + Db + '%s table data cleared' % table[0], xbmc.LOGINFO)
 
 			except Exception as e:
-				Log(Log_Title + Db + 'database remove table error: %s[CR]%s' % (table[0], str(e)), xbmc.LOGERROR)
+				Log(Log_Title + Db + '%s remove table error: %s' % (table[0], str(e)), xbmc.LOGERROR)
 
 	database_path = database_selected.replace('\\', '/').split('/')
 	database = ('[COLOR %s] > %s > [/COLOR][COLOR %s]%s[/COLOR]' % (TEXT_DIM, database_path[len(database_path)-2], TEXT_DARK, database_path[len(database_path)-1]))
