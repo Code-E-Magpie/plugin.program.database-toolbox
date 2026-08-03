@@ -241,7 +241,7 @@ def Clean_Addons_Database():
 		success = True
 
 	except sqlite3.Error as e:
-		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Unable to clean addons database: [COLOR %s]%s[/COLOR][CR]See Kodi System Log for details.[/LIGHT][/COLOR][CR]The database may not exsist.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, addons_db))
+		Dialogue.ok(Addon_Title, '[COLOR %s]Clean Addons Database: [LIGHT](User Information)[CR][COLOR %s]Unable to clean addons database: [COLOR %s]%s[/COLOR][CR]The database may not exsist.[/LIGHT][/COLOR][CR]See Kodi System Log for details.[/COLOR]' % (TEXT_GENERAL, TEXT_ITEM, TEXT_VALUE, addons_db))
 		Log(Log_Title + Addons + '%s read error: %s' % (addons_db, str(e)), xbmc.LOGERROR)
 		return ''
 
