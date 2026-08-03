@@ -393,7 +393,7 @@ def Database_Files():
 
 	database_count, thumbs_count = Database_Count()
 
-	Database_Files_Text = '[COLOR %s][B]%s[/B][COLOR %s][LIGHT][CR](Full Path / Database Size)[/LIGHT][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, ' '.join('DATABASE FILES'), TEXT_VALUE, TEXT_GENERAL, database)
+	Database_Files_Text = '[COLOR %s][B]%s[/B][COLOR %s][LIGHT][CR](Data Source: %s)[/LIGHT][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, ' '.join('DATABASE FILES'), TEXT_VALUE, DATABASE_PATH, TEXT_GENERAL, database)
 
 	TextBox('[B]%s[/B][CR][COLOR %s]Databases: [/COLOR][COLOR %s]%s  [/COLOR][COLOR %s][LIGHT]Thumbs.db files: [/COLOR][COLOR %s]%s[/LIGHT][/COLOR]' % (Addon_Title, TEXT_ITEM, TEXT_VALUE, database_count, TEXT_ITEM, TEXT_VALUE, thumbs_count), Database_Files_Text)
 
