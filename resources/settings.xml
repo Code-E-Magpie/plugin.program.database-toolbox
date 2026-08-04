@@ -3,15 +3,13 @@
 
 	<!-- Main Settings -->
 	<category label="[LIGHT]Main Settings[/LIGHT]">
-		<setting type="label" label="[COLOR blue]Database Size Highlight / Database Information Spacer Row[/COLOR]"/>
-		<setting id="DATABASE_SIZE_HIGHLIGHT" type="number" label="[COLOR silver]Database size highlight[LIGHT] (default = 1048576 i.e. 1 MB)[/LIGHT][/COLOR]" enable="true" default="1048576"/>
-		<setting id="DATABASE_SPACER_ROW" type="bool" label="[COLOR silver]Database Information spacer row on / off[LIGHT] (default = on)[/LIGHT][/COLOR]" enable="true" default="true"/>
-		<setting type="sep"/>
 		<setting type="label" label="[COLOR blue]Dialogue Boxes / Notifications / Notification Duration[/COLOR]"/>
 		<setting id="DIALOGUE_BOXES" type="bool" label="[COLOR silver]Clean Databases (folder) options dialogue boxes on / off[LIGHT] (default = on)[/LIGHT][/COLOR]" enable="true" default="true"/>
 		<setting id="NOTIFICATIONS" type="bool" label="[COLOR silver]Clean Databases (folder) options notifications on / off[LIGHT] (default = on)[/LIGHT][/COLOR]" enable="true" default="true"/>
 		<setting id="NOTIFICATION_DURATION" type="number" label="[COLOR silver]Notification duration[LIGHT] (default = 3000ms i.e. 3 seconds)[/LIGHT][/COLOR]" enable="true" default="3000"/>
 		<setting type="sep"/>
+		<setting type="label" label="[COLOR blue]Size Highlight[/COLOR]"/>
+		<setting id="SIZE_HIGHLIGHT" type="number" label="[COLOR silver]Size highlight[LIGHT] (default = 1048576 i.e. 1 MB)[/LIGHT][/COLOR]" enable="true" default="1048576"/>
 	</category>
 
 	<!-- Text Colours -->
