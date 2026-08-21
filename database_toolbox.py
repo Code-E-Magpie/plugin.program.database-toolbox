@@ -26,17 +26,15 @@ import fnmatch, glob, os, re, sqlite3, sys
 
 ADDON_ID = xbmcaddon.Addon().getAddonInfo('id') # id in addons.xml
 ADDON = xbmcaddon.Addon(ADDON_ID)
-ADDON_DATA_PATH = 'special://userdata/addon_data'
+ADDON_DATA = xbmcvfs.translatePath('special://userdata/addon_data')
 ADDON_DEVELOPER = ADDON.getAddonInfo('author') # provider-name in addons.xml (developer)
 ADDON_FANART = ADDON.getAddonInfo('fanart')
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_NAME = ADDON.getAddonInfo('name') # name in addons.xml
 ADDON_VERSION = ADDON.getAddonInfo('version') # version in addons.xml
-ADDONS_PATH = 'special://home/addons'
+ADDONS = xbmcvfs.translatePath('special://home/addons')
 DATABASE = xbmcvfs.translatePath('special://database/')
-DATABASE_PATH = 'special://database/'
 HOME = xbmcvfs.translatePath('special://home/')
-HOME_PATH = 'special://home/'
 NOTIFICATION_DURATION = ADDON.getSetting('NOTIFICATION_DURATION')
 PLUGIN_ID = int(sys.argv[1])
 PLUGIN_URL = sys.argv[0]
@@ -49,7 +47,7 @@ TEXT_HIGHLIGHT = ADDON.getSetting('TEXT_HIGHLIGHT')
 TEXT_ITEM = ADDON.getSetting('TEXT_ITEM')
 TEXT_VALUE = ADDON.getSetting('TEXT_VALUE')
 TOOLBOX = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'media', 'toolbox.png')
-USERDATA_PATH = 'special://userdata/'
+USERDATA = xbmcvfs.translatePath('special://userdata/')
 
 # ============================================================
 # Addon_ID_Version / Addon_Title / Dialogue / Log_Title
@@ -399,7 +397,7 @@ def Database_Files():
 
 	database_count, thumbs_count = Database_Count()
 
-	Database_Files_Text = '[COLOR %s][B]%s[/B][COLOR %s][LIGHT][CR](Data Source: %s)[/LIGHT][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, ' '.join('DATABASE FILES'), TEXT_VALUE, DATABASE_PATH, TEXT_GENERAL, database)
+	Database_Files_Text = '[COLOR %s][B]%s[/B][COLOR %s][LIGHT][CR](Data Source: %s)[/LIGHT][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, ' '.join('DATABASE FILES'), TEXT_VALUE, HOME, TEXT_GENERAL, database)
 
 	TextBox('[B]%s[/B][CR][COLOR %s]Databases: [/COLOR][COLOR %s]%s  [/COLOR][COLOR %s][LIGHT]Thumbs.db files: [/COLOR][COLOR %s]%s[/LIGHT][/COLOR]' % (Addon_Title, TEXT_ITEM, TEXT_VALUE, database_count, TEXT_ITEM, TEXT_VALUE, thumbs_count), Database_Files_Text)
 
@@ -416,19 +414,19 @@ elif '/Clean_Addons_Database' in PLUGIN_URL:
 	Clean_Addons_Database()
 
 elif '/Databases_Addon_Data' in PLUGIN_URL:
-	Clean_Databases(ADDON_DATA_PATH)
+	Clean_Databases(ADDON_DATA)
 
 elif '/Databases_Addons' in PLUGIN_URL:
-	Clean_Databases(ADDONS_PATH)
+	Clean_Databases(ADDONS)
 
 elif '/Databases_Database' in PLUGIN_URL:
-	Clean_Databases(DATABASE_PATH)
+	Clean_Databases(DATABASE)
 
 elif '/Databases_Home' in PLUGIN_URL:
-	Clean_Databases(HOME_PATH)
+	Clean_Databases(HOME)
 
 elif '/Databases_Userdata' in PLUGIN_URL:
-	Clean_Databases(USERDATA_PATH)
+	Clean_Databases(USERDATA)
 
 elif '/Database_Files' in PLUGIN_URL:
 	Database_Files()
