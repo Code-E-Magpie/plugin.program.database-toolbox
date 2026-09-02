@@ -4,9 +4,9 @@
 	<!-- Main Settings -->
 	<category label="[LIGHT]Main Settings[/LIGHT]">
 		<setting id= "MA1" type="lsep" label="[COLOR blue]Notification Duration[/COLOR]"/>
-		<setting id="notification_duration" type="number" label="[COLOR silver]Notification duration[LIGHT] (default = 3000ms i.e. 3 seconds)[/LIGHT][/COLOR]" enable="true" default="3000"/>
-		<setting id= "MA2" type="lsep" label="[COLOR blue]Size Highlight / Dialogue Boxes / Notifications[/COLOR]"/>
-		<setting id="size_highlight" type="number" label="[COLOR silver]Size highlight[LIGHT] (default = 1048576 i.e. 1 MB)[/LIGHT][/COLOR]" enable="true" default="1048576"/>
+		<setting id="notification_duration" type="number" label="[COLOR silver]Notification Duration[LIGHT] (default = 3000ms i.e. 3 seconds)[/LIGHT][/COLOR]" enable="true" default="3000"/>
+		<setting id= "MA2" type="lsep" label="[COLOR blue]Size Highlight / Clean Databases[/COLOR]"/>
+		<setting id="size_highlight" type="number" label="[COLOR silver]Size Highlight[LIGHT] (default = 1048576 i.e. 1 MB)[/LIGHT][/COLOR]" enable="true" default="1048576"/>
 		<setting id="dialogue_boxes" type="bool" label="[COLOR silver]Clean Databases (folder) options dialogue boxes on / off[LIGHT] (default = on)[/LIGHT][/COLOR]" enable="true" default="true"/>
 		<setting id="notifications" type="bool" label="[COLOR silver]Clean Databases (folder) options notifications on / off[LIGHT] (default = on)[/LIGHT][/COLOR]" enable="true" default="true"/>
 	</category>
