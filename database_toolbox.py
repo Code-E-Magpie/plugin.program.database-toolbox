@@ -71,8 +71,8 @@ Menu = ('[COLOR %s]menu > [/COLOR]' % TEXT_GENERAL)
 # FUNCTION: Log
 # ============================================================
 
-def Log(msg, level = xbmc.LOGDEBUG):
-	xbmc.log(msg, level = level)
+def Log(message, level = xbmc.LOGDEBUG):
+	xbmc.log(message, level = level)
 
 # ============================================================
 # FUNCTION: Notification
@@ -112,7 +112,7 @@ ACTION_NAV_BACK = 92 # Backspace action
 ACTION_PREVIOUS_MENU = 10 # ESC action
 ACTION_SELECT_ITEM = 7 # Number Pad Enter
 
-def TextBox(title, msg):
+def TextBox(title, text):
 	class TextBoxes(xbmcgui.WindowXMLDialog):
 
 		def onAction(self, action):
@@ -120,24 +120,24 @@ def TextBox(title, msg):
 			elif action == ACTION_NAV_BACK: self.close()
 
 		def onClick(self, controlId):
-			if (controlId == self.okbutton):
+			if (controlId == self.close_button):
 				self.close()
-			elif controlId != self.okbutton:
+			elif controlId != self.close_button:
 				self.noop = lambda: None
 
 		def onInit(self): # group = 8000, background = 8100, noop = 8181
-			self.title = 8200 # header
-			self.msg = 8300 # textbox
-			self.scrollbar = 8400 # scrollbar
-			self.okbutton = 8500 # close button
+			self.title = 8200
+			self.text = 8300
+			self.scrollbar = 8400
+			self.close_button = 8500
 			self.noop = lambda: None
 			self.showDialog()
 
 		def showDialog(self):
 			close = '[COLOR %s]Close[/COLOR]' % TEXT_GENERAL
 			self.getControl(self.title).setLabel(title)
-			self.getControl(self.okbutton).setLabel(close)
-			self.getControl(self.msg).setText(msg)
+			self.getControl(self.close_button).setLabel(close)
+			self.getControl(self.text).setText(text)
 			self.setFocusId(self.scrollbar)
 
 	textbox = TextBoxes("Textbox.xml", ADDON.getAddonInfo('path'), 'default')
@@ -184,7 +184,7 @@ SETTINGS_TEXT = '[CR][CR][CR]%s[CR][CR]Press the OK button in settings to save a
 
 ENVIRONMENT_TEXT = '[CR][CR][CR]%s[CR][CR]Kodi v21.3 Omega apk (Android app) with Confluence skin as default (including default font).[CR]Tablet (1340 x 800 aspect ratio 5:3) running Android 14 using QuickEdit apk (TryItAndSee / LearnAsYouGo iterative development and testing).[CR]Chromecast HD (1280 x 720 aspect ratio 16:9) running Android TV OS version 14 (user testing).[CR]100%% tested and working on Android.[CR]Not tested on other platforms.[CR]Code debugged and reengineered using https://aipy.dev/tools where required (pre 2.10.0).[CR]Code debugged and reengineered using https://stackoverflow.com/ai-assist (2.10.0 onwards).' % ' '.join('DEVELOPMENT ENVIRONMENT')
 
-CHANGELOG_TEXT = '[CR][CR][CR]%s[LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 2.10.3 (10 menu items)[CR]- settings reworked to avoid clashes (different names to variables etc.)[CR][CR]version 2.10.2 (10 menu items)[CR]- Clean Addons Database futureproofing added to select Addons*.db[CR]- minor changes to menu formatting[CR][CR]version 2.10.1 (10 menu items)[CR]- added text colour customisation to text boxes and buttons[CR]- added pre clean database size to dialogue boxes (\'Clean Databases (folder)\' options)[CR]- database information formatting reworked and renamed \'Database Files (.db file list) >\'[CR]- added size highlight above value set in settings[CR]- minor changes to improve consistency with other add-ons[CR][CR]version 2.10.0 (10 menu items)[CR]- code added from OpenWizard 2.0.7 by drinfernoo & slamious (plugin.program.openwizard)[CR]- Clean Databases created[CR]- Database Information created[CR]- variables and functions reworked[CR]- menu, multiselect dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR]- added user settings for dialogue boxes, notifications, notification duration and trillions of text colour combinations[CR][CR]version 1.3.1 (3 menu items)[CR]- database variable added[CR]- dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by %s (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- Clean Addons Database created[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information added (instructions, notes, development and changelog)' % (' '.join('CHANGELOG'), ADDON_DEVELOPER)
+CHANGELOG_TEXT = '[CR][CR][CR]%s[LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 2.10.3 (10 menu items)[CR]- settings reworked to avoid clashes (different names to variables etc.)[CR]- minor changes to TextBox.xml to improve performance and consistency with other add-ons[CR]- minor changes to Log and TextBox functions to improve consistency with other add-ons[CR][CR]version 2.10.2 (10 menu items)[CR]- Clean Addons Database futureproofing added to select Addons*.db[CR]- minor changes to menu formatting[CR][CR]version 2.10.1 (10 menu items)[CR]- added text colour customisation to text boxes and buttons[CR]- added pre clean database size to dialogue boxes (\'Clean Databases (folder)\' options)[CR]- database information formatting reworked and renamed \'Database Files (.db file list) >\'[CR]- added size highlight above value set in settings[CR]- minor changes to improve consistency with other add-ons[CR][CR]version 2.10.0 (10 menu items)[CR]- code added from OpenWizard 2.0.7 by drinfernoo & slamious (plugin.program.openwizard)[CR]- Clean Databases created[CR]- Database Information created[CR]- variables and functions reworked[CR]- menu, multiselect dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR]- added user settings for dialogue boxes, notifications, notification duration and trillions of text colour combinations[CR][CR]version 1.3.1 (3 menu items)[CR]- database variable added[CR]- dialogue boxes and logs reworked[CR]- user information updated including instructions and notes[CR][CR]version 1.3.0 (3 menu items)[CR]- initial code from Abacus Program 1.0.0 by %s (plugin.program.code-e-magpie)[CR]- code added from Truncate Tables 1.0.1 by The Cleaner (plugin.program.truncatetables)[CR]- Clean Addons Database created[CR]- icon.png changed and toolbox.png added[CR]- variables and functions reworked[CR]- menu, dialogue boxes and logs reworked[CR]- user information added (instructions, notes, development and changelog)' % (' '.join('CHANGELOG'), ADDON_DEVELOPER)
 
 User_Information_Text = '[COLOR %s][B]%s[/B][CR][COLOR %s][LIGHT](Instructions / Notes / Settings / Development Environment / Changelog)[/LIGHT][/COLOR][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, ' '.join('USER INFORMATION'), TEXT_VALUE, TEXT_GENERAL, (INSTRUCTIONS_TEXT + NOTES_TEXT + SETTINGS_TEXT + ENVIRONMENT_TEXT + CHANGELOG_TEXT))
 
